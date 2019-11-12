@@ -9,6 +9,9 @@ import com.mxrck.autocompleter.TextAutoCompleter;
 import db.Conexion;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import javax.swing.JButton;
+import javax.swing.table.DefaultTableModel;
+import misc.Render;
 import misc.Usuario;
 
 /**
@@ -19,6 +22,11 @@ public class BuscarEquipo extends javax.swing.JFrame {
     public Usuario usuario = Opciones.usuario;
     public Conexion cn = new Conexion();
     ResultSet rs;
+    DefaultTableModel modelo = new DefaultTableModel(){
+    @Override
+    public boolean isCellEditable(int rowIndex,int columnIndex){return false;}
+    };
+    JButton btnAbrir = new JButton("Abrir");
 
     /**
      * Creates new form BuscarEquipo
@@ -30,7 +38,6 @@ public class BuscarEquipo extends javax.swing.JFrame {
         //cn.conectar();
         this.setLocationRelativeTo(null);
         llenarNS();
-        
     }
     /**
      *  Metodo para Obtener NS de la BD y agregarlos al TextAutoCompleter
@@ -72,10 +79,39 @@ public class BuscarEquipo extends javax.swing.JFrame {
                     lblTonerYellow_.setText(String.valueOf(rs.getInt(4)));
                     lblTonerBlack_.setText(String.valueOf(rs.getInt(5)));
                 }
+                llenarTabla();
                 cn.desconectar();
             }catch(SQLException e){
                 System.out.println(e.getMessage());
             }
+        }
+    }
+    private void llenarTabla(){
+        modelo.setRowCount(0);
+        modelo.setColumnIdentifiers(new Object[]{"ID","TICKET","FECHA","DETALLE","OBSERVACIONES","PATH","VER"});
+        tabla.setDefaultRenderer(Object.class, new Render());
+        try {
+            rs =cn.consulta("SELECT * FROM Docs WHERE ns ='"+tfNS.getText()+"' ORDER BY fecha DESC");
+            while(rs.next()){
+                String ticketOpc;
+                if (null==rs.getString("ticket")) {
+                    ticketOpc = rs.getString("ticket");
+                }else switch (rs.getString("ticket")) {
+                    case "1":
+                        ticketOpc = "Falla Sin Ticket";
+                        break;
+                    case "2":
+                        ticketOpc = "Cambio de Toner";
+                        break;
+                    default:
+                        ticketOpc = rs.getString("ticket");
+                        break;
+                }
+                modelo.addRow(new Object[]{rs.getInt("id"),ticketOpc,rs.getString("fecha"),rs.getString("detalle"),rs.getString("observaciones"),rs.getString("path"),btnAbrir});
+            }
+            tabla.setModel(modelo);
+        } catch (SQLException ex) {
+            System.out.println(ex);
         }
     }
     
@@ -121,6 +157,9 @@ public class BuscarEquipo extends javax.swing.JFrame {
         lblTonerYellow_ = new javax.swing.JLabel();
         lblTonerBlack = new javax.swing.JLabel();
         lblTonerBlack_ = new javax.swing.JLabel();
+        pnlTabla = new javax.swing.JPanel();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        tabla = new javax.swing.JTable();
         lblFondo = new javax.swing.JLabel();
 
         pnlGlass.setOpaque(false);
@@ -412,6 +451,46 @@ public class BuscarEquipo extends javax.swing.JFrame {
 
         getContentPane().add(pnlInventario, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 180, 200, 140));
 
+        pnlTabla.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Historial", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 14), new java.awt.Color(255, 255, 255))); // NOI18N
+        pnlTabla.setOpaque(false);
+
+        tabla.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        tabla.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+
+            },
+            new String [] {
+                "ID", "TICKET", "FECHA", "DETALLE", "OBSERVACIONES", "PATH", "VER"
+            }
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false, true, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        tabla.setEnabled(false);
+        tabla.setOpaque(false);
+        tabla.getTableHeader().setReorderingAllowed(false);
+        jScrollPane1.setViewportView(tabla);
+
+        javax.swing.GroupLayout pnlTablaLayout = new javax.swing.GroupLayout(pnlTabla);
+        pnlTabla.setLayout(pnlTablaLayout);
+        pnlTablaLayout.setHorizontalGroup(
+            pnlTablaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 818, Short.MAX_VALUE)
+        );
+        pnlTablaLayout.setVerticalGroup(
+            pnlTablaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlTablaLayout.createSequentialGroup()
+                .addGap(0, 0, Short.MAX_VALUE)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 185, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        getContentPane().add(pnlTabla, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 330, 830, 210));
+
         lblFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/FondoBuscarNS.png"))); // NOI18N
         getContentPane().add(lblFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
@@ -473,6 +552,7 @@ public class BuscarEquipo extends javax.swing.JFrame {
     private org.jdesktop.swingx.JXBusyLabel blEstado;
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnLogOut;
+    private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblFondo;
     private javax.swing.JLabel lblIP;
     private javax.swing.JLabel lblIP_;
@@ -503,6 +583,8 @@ public class BuscarEquipo extends javax.swing.JFrame {
     private javax.swing.JPanel pnlDatos;
     private javax.swing.JPanel pnlGlass;
     private javax.swing.JPanel pnlInventario;
+    private javax.swing.JPanel pnlTabla;
+    private javax.swing.JTable tabla;
     private javax.swing.JTextField tfNS;
     // End of variables declaration//GEN-END:variables
 }
