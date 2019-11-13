@@ -5,8 +5,12 @@
  */
 package Ventanas;
 
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.SftpException;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import db.Conexion;
+import ftp.SFTPConnector;
+import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JButton;
@@ -27,15 +31,14 @@ public class BuscarEquipo extends javax.swing.JFrame {
     public boolean isCellEditable(int rowIndex,int columnIndex){return false;}
     };
     JButton btnAbrir = new JButton("Abrir");
+    String pathDescarga;
 
     /**
      * Creates new form BuscarEquipo
      */
     public BuscarEquipo() {
         initComponents();
-        pnlGlass.setVisible(false);
-        blEstado.setVisible(false);
-        //cn.conectar();
+        BusyLabel.setVisible(false);
         this.setLocationRelativeTo(null);
         llenarNS();
     }
@@ -59,6 +62,10 @@ public class BuscarEquipo extends javax.swing.JFrame {
    
     private void getValores(String serie){
         if (!serie.isEmpty()) {
+            
+            BusyLabel.setText("Descargando Informacion");
+            BusyLabel.setBusy(true);
+            BusyLabel.setVisible(true);
             try{
                 cn.conectar();
                 rs = cn.consulta("SELECT * FROM Equipo WHERE ns = '"+tfNS.getText()+"'");
@@ -87,6 +94,7 @@ public class BuscarEquipo extends javax.swing.JFrame {
         }
     }
     private void llenarTabla(){
+        BusyLabel.setText("Llenando Tabla");
         modelo.setRowCount(0);
         modelo.setColumnIdentifiers(new Object[]{"ID","TICKET","FECHA","DETALLE","OBSERVACIONES","PATH","VER"});
         tabla.setDefaultRenderer(Object.class, new Render());
@@ -110,8 +118,37 @@ public class BuscarEquipo extends javax.swing.JFrame {
                 modelo.addRow(new Object[]{rs.getInt("id"),ticketOpc,rs.getString("fecha"),rs.getString("detalle"),rs.getString("observaciones"),rs.getString("path"),btnAbrir});
             }
             tabla.setModel(modelo);
+            BusyLabel.setBusy(false);
+            //BusyLabel.setVisible(false);
         } catch (SQLException ex) {
             System.out.println(ex);
+        }
+    }
+    private void bajarArchivoSFTP(){
+        String user ="archivo";
+        String pass ="soportemx";
+        String host ="192.168.40.15";
+        int port = 22;
+        try {
+            SFTPConnector connector = new SFTPConnector();
+            System.out.println("conectando.....");
+            connector.connect(user, pass, host, port); //conecta al servidor
+            System.out.println("Conectado");
+            connector.getFile(pathDescarga);
+            connector.disconnect();
+            
+        } catch (JSchException | IllegalAccessException | IOException | SftpException ex) {
+            System.out.println(ex.getMessage());
+        }
+    }
+    
+    private void abrirArchivo(){
+        try {
+            ProcessBuilder pb = new ProcessBuilder();
+            pb.command("cmd.exe","/c","C:\\Users\\Ruben Angeles\\Desktop\\Scan\\temp.pdf");
+            pb.start();
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
         }
     }
     
@@ -124,9 +161,8 @@ public class BuscarEquipo extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        pnlGlass = new javax.swing.JPanel();
         lblTitulo = new javax.swing.JLabel();
-        blEstado = new org.jdesktop.swingx.JXBusyLabel();
+        BusyLabel = new org.jdesktop.swingx.JXBusyLabel();
         btnLogOut = new javax.swing.JButton();
         pnlBusqueda = new javax.swing.JPanel();
         lblNS = new javax.swing.JLabel();
@@ -162,19 +198,6 @@ public class BuscarEquipo extends javax.swing.JFrame {
         tabla = new javax.swing.JTable();
         lblFondo = new javax.swing.JLabel();
 
-        pnlGlass.setOpaque(false);
-
-        javax.swing.GroupLayout pnlGlassLayout = new javax.swing.GroupLayout(pnlGlass);
-        pnlGlass.setLayout(pnlGlassLayout);
-        pnlGlassLayout.setHorizontalGroup(
-            pnlGlassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 780, Short.MAX_VALUE)
-        );
-        pnlGlassLayout.setVerticalGroup(
-            pnlGlassLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 430, Short.MAX_VALUE)
-        );
-
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
@@ -184,10 +207,9 @@ public class BuscarEquipo extends javax.swing.JFrame {
         lblTitulo.setText("Consultar NS");
         getContentPane().add(lblTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 20, -1, -1));
 
-        blEstado.setForeground(new java.awt.Color(255, 255, 255));
-        blEstado.setText("Cargando");
-        blEstado.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
-        getContentPane().add(blEstado, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 140, -1));
+        BusyLabel.setForeground(new java.awt.Color(255, 255, 255));
+        BusyLabel.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        getContentPane().add(BusyLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, -1, -1));
 
         btnLogOut.setBackground(new java.awt.Color(153, 204, 255));
         btnLogOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/exit32.png"))); // NOI18N
@@ -474,6 +496,11 @@ public class BuscarEquipo extends javax.swing.JFrame {
         tabla.setEnabled(false);
         tabla.setOpaque(false);
         tabla.getTableHeader().setReorderingAllowed(false);
+        tabla.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tablaMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tabla);
 
         javax.swing.GroupLayout pnlTablaLayout = new javax.swing.GroupLayout(pnlTabla);
@@ -505,13 +532,29 @@ public class BuscarEquipo extends javax.swing.JFrame {
     }//GEN-LAST:event_btnLogOutActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-        pnlGlass.setVisible(true);
-        blEstado.setText("Buscando...");
-        blEstado.setBusy(true);
+       
         getValores(tfNS.getText());
-        blEstado.setBusy(false);
-        pnlGlass.setVisible(false);
+        
     }//GEN-LAST:event_btnBuscarActionPerformed
+
+    private void tablaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaMouseClicked
+        int columna = tabla.getColumnModel().getColumnIndexAtX(evt.getX());
+        int fila = evt.getY()/tabla.getRowHeight();
+        if (fila < tabla.getRowCount() && fila >= 0 && columna < tabla.getColumnCount() && columna >= 0) {
+            Object o = tabla.getValueAt(fila, columna);
+            if (o instanceof JButton) {
+                ((JButton)o).doClick();
+                JButton btn = (JButton)o;
+                System.out.println("PATH: "+tabla.getValueAt(fila,5));
+                pathDescarga =  String.valueOf(tabla.getValueAt(fila, 5));
+                BusyLabel.setText("Descargando Archivo");
+                BusyLabel.setBusy(true);
+                bajarArchivoSFTP();
+                BusyLabel.setText("Abriendo Archivo");
+                abrirArchivo();
+            }
+        }
+    }//GEN-LAST:event_tablaMouseClicked
 
     /**
      * @param args the command line arguments
@@ -549,7 +592,7 @@ public class BuscarEquipo extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.jdesktop.swingx.JXBusyLabel blEstado;
+    private org.jdesktop.swingx.JXBusyLabel BusyLabel;
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnLogOut;
     private javax.swing.JScrollPane jScrollPane1;
@@ -581,7 +624,6 @@ public class BuscarEquipo extends javax.swing.JFrame {
     private javax.swing.JLabel lbltTonerYellow;
     private javax.swing.JPanel pnlBusqueda;
     private javax.swing.JPanel pnlDatos;
-    private javax.swing.JPanel pnlGlass;
     private javax.swing.JPanel pnlInventario;
     private javax.swing.JPanel pnlTabla;
     private javax.swing.JTable tabla;
