@@ -8,11 +8,9 @@ package Ventanas;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import com.mxrck.autocompleter.TextAutoCompleter;
-import com.sun.org.apache.bcel.internal.generic.AALOAD;
 import db.Conexion;
 import ftp.SFTPConnector;
 import java.io.IOException;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import misc.Ticket;
@@ -23,11 +21,12 @@ import misc.Usuario;
  * @author Ruben Angeles
  */
 public class BuscarTicket extends javax.swing.JFrame {
-    
+
     public Usuario usuario = Opciones.usuario;
     private Ticket t = new Ticket();
     public Conexion cn = new Conexion();
     ResultSet rs;
+
     /**
      * Creates new form BuscarTicket
      */
@@ -36,13 +35,13 @@ public class BuscarTicket extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         llenarTicket();
     }
-    
-    private void llenarTicket(){
+
+    private void llenarTicket() {
         TextAutoCompleter textAutoCompleter = new TextAutoCompleter(tfTicket);
         try {
             cn.conectar();
-            rs =cn.consulta("SELECT ticket FROM Docs");
-            while(rs.next()){
+            rs = cn.consulta("SELECT ticket FROM Docs");
+            while (rs.next()) {
                 //cbNS.addItem(resultado.getString("ns"));
                 switch (rs.getInt("ticket")) {
                     case 2:
@@ -61,12 +60,12 @@ public class BuscarTicket extends javax.swing.JFrame {
             System.out.println(ex);
         }
     }
-    
-    private void getValores(String serie){
+
+    private void getValores(String serie) {
         if (!serie.isEmpty()) {
-            try{
+            try {
                 cn.conectar();
-                rs = cn.consulta("SELECT * FROM Docs WHERE ticket = '"+tfTicket.getText()+"'");
+                rs = cn.consulta("SELECT * FROM Docs WHERE ticket = '" + tfTicket.getText() + "'");
                 while (rs.next()) {
                     t.setId(rs.getInt("id"));
                     t.setNs(rs.getString("ns"));
@@ -76,19 +75,19 @@ public class BuscarTicket extends javax.swing.JFrame {
                     t.setObservaciones(rs.getString("observaciones"));
                     t.setPath(rs.getString("path"));
                 }
-                rs = cn.consulta("SELECT * FROM Equipo WHERE ns = '"+t.getNs()+"'");
-                while(rs.next()){
+                rs = cn.consulta("SELECT * FROM Equipo WHERE ns = '" + t.getNs() + "'");
+                while (rs.next()) {
                     lblSerie_.setText(rs.getString(1));
                     lblMarca_.setText(rs.getString(2));
-                    lblModelo_.setText(rs.getString(3)+" "+rs.getString(4));
-                    lblUbicacion_.setText(rs.getString(7)+" "+rs.getString(8));
+                    lblModelo_.setText(rs.getString(3) + " " + rs.getString(4));
+                    lblUbicacion_.setText(rs.getString(7) + " " + rs.getString(8));
                     lblIP_.setText(rs.getString(5));
                     lblMac_.setText(rs.getString(6));
                     lblTipo_.setText(rs.getString(9));
                     lblToner_.setText(rs.getString(10));
                 }
-                rs = cn.consulta("SELECT * FROM Toner WHERE modelo = '"+lblToner_.getText()+"'");
-                while(rs.next()){
+                rs = cn.consulta("SELECT * FROM Toner WHERE modelo = '" + lblToner_.getText() + "'");
+                while (rs.next()) {
                     lblTonerCian_.setText(String.valueOf(rs.getInt(2)));
                     lblTonerMagenta_.setText(String.valueOf(rs.getInt(3)));
                     lblTonerYellow_.setText(String.valueOf(rs.getInt(4)));
@@ -99,16 +98,16 @@ public class BuscarTicket extends javax.swing.JFrame {
                 lblDetalles_.setText(t.getDetalle());
                 lblObservaciones_.setText(t.getObservaciones());
                 lblFecha_.setText(String.valueOf(t.getFecha()));
-            }catch(SQLException e){
+            } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
         }
     }
-    
-        private void bajarArchivoSFTP(){
-        String user ="archivo";
-        String pass ="soportemx";
-        String host ="192.168.40.15";
+
+    private void bajarArchivoSFTP() {
+        String user = "archivo";
+        String pass = "soportemx";
+        String host = "192.168.40.15";
         int port = 22;
         try {
             SFTPConnector connector = new SFTPConnector();
@@ -117,16 +116,16 @@ public class BuscarTicket extends javax.swing.JFrame {
             System.out.println("Conectado");
             connector.getFile(t.getPath());
             connector.disconnect();
-            
-        } catch (JSchException | IllegalAccessException | SftpException |  IOException ex) {
+
+        } catch (JSchException | IllegalAccessException | SftpException | IOException ex) {
             System.out.println(ex.getMessage());
         }
     }
-    
-    private void abrirArchivo(){
+
+    private void abrirArchivo() {
         try {
             ProcessBuilder pb = new ProcessBuilder();
-            pb.command("cmd.exe","/c","C:\\Users\\Ruben Angeles\\Desktop\\Scan\\temp.pdf");
+            pb.command("cmd.exe", "/c", "C:\\Users\\Ruben Angeles\\Desktop\\Scan\\temp.pdf");
             pb.start();
         } catch (IOException ex) {
             System.out.println(ex.getMessage());
@@ -186,6 +185,7 @@ public class BuscarTicket extends javax.swing.JFrame {
         lblFondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         btnLogOut.setBackground(new java.awt.Color(153, 204, 255));
@@ -569,6 +569,7 @@ public class BuscarTicket extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnVerArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerArchivoActionPerformed
+        
         bajarArchivoSFTP();
         abrirArchivo();
     }//GEN-LAST:event_btnVerArchivoActionPerformed
@@ -593,7 +594,7 @@ public class BuscarTicket extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(BuscarTicket.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
-        
+
         //</editor-fold>
 
         /* Create and display the form */
