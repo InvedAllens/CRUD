@@ -62,6 +62,11 @@ public class Opciones extends javax.swing.JFrame {
 
         btnBuscarTicket.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/BuscarDoc96.png"))); // NOI18N
         btnBuscarTicket.setToolTipText("Buscar Ticket");
+        btnBuscarTicket.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBuscarTicketActionPerformed(evt);
+            }
+        });
         pnlBotonesBusquedas.add(btnBuscarTicket, new java.awt.GridBagConstraints());
 
         btnBuscarEquipo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/lupa96.png"))); // NOI18N
@@ -139,6 +144,12 @@ public class Opciones extends javax.swing.JFrame {
         this.dispose();
         b.setVisible(true);
     }//GEN-LAST:event_btnBuscarEquipoActionPerformed
+
+    private void btnBuscarTicketActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarTicketActionPerformed
+        BuscarTicket bt = new BuscarTicket();
+        this.dispose();
+        bt.setVisible(true);
+    }//GEN-LAST:event_btnBuscarTicketActionPerformed
 
     /**
      * @param args the command line arguments
