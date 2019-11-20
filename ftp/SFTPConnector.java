@@ -7,7 +7,7 @@ import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
 import java.io.IOException;
 
-public class SFTPConnector{
+public class SFTPConnector {
     private Session session;
     /**
      * Establece una  conexion a un servidor SFTP

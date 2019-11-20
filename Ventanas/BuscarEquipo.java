@@ -38,7 +38,6 @@ public class BuscarEquipo extends javax.swing.JFrame {
      */
     public BuscarEquipo() {
         initComponents();
-        BusyLabel.setVisible(false);
         this.setLocationRelativeTo(null);
         llenarNS();
     }
@@ -62,10 +61,6 @@ public class BuscarEquipo extends javax.swing.JFrame {
    
     private void getValores(String serie){
         if (!serie.isEmpty()) {
-            
-            BusyLabel.setText("Descargando Informacion");
-            BusyLabel.setBusy(true);
-            BusyLabel.setVisible(true);
             try{
                 cn.conectar();
                 rs = cn.consulta("SELECT * FROM Equipo WHERE ns = '"+tfNS.getText()+"'");
@@ -94,7 +89,6 @@ public class BuscarEquipo extends javax.swing.JFrame {
         }
     }
     private void llenarTabla(){
-        BusyLabel.setText("Llenando Tabla");
         modelo.setRowCount(0);
         modelo.setColumnIdentifiers(new Object[]{"ID","TICKET","FECHA","DETALLE","OBSERVACIONES","PATH","VER"});
         tabla.setDefaultRenderer(Object.class, new Render());
@@ -118,12 +112,12 @@ public class BuscarEquipo extends javax.swing.JFrame {
                 modelo.addRow(new Object[]{rs.getInt("id"),ticketOpc,rs.getString("fecha"),rs.getString("detalle"),rs.getString("observaciones"),rs.getString("path"),btnAbrir});
             }
             tabla.setModel(modelo);
-            BusyLabel.setBusy(false);
             //BusyLabel.setVisible(false);
         } catch (SQLException ex) {
             System.out.println(ex);
         }
     }
+    
     private void bajarArchivoSFTP(){
         String user ="archivo";
         String pass ="soportemx";
@@ -162,7 +156,6 @@ public class BuscarEquipo extends javax.swing.JFrame {
     private void initComponents() {
 
         lblTitulo = new javax.swing.JLabel();
-        BusyLabel = new org.jdesktop.swingx.JXBusyLabel();
         btnLogOut = new javax.swing.JButton();
         pnlBusqueda = new javax.swing.JPanel();
         lblNS = new javax.swing.JLabel();
@@ -206,10 +199,6 @@ public class BuscarEquipo extends javax.swing.JFrame {
         lblTitulo.setForeground(new java.awt.Color(255, 255, 255));
         lblTitulo.setText("Consultar NS");
         getContentPane().add(lblTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 20, -1, -1));
-
-        BusyLabel.setForeground(new java.awt.Color(255, 255, 255));
-        BusyLabel.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        getContentPane().add(BusyLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 30, -1, -1));
 
         btnLogOut.setBackground(new java.awt.Color(153, 204, 255));
         btnLogOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/exit32.png"))); // NOI18N
@@ -356,7 +345,7 @@ public class BuscarEquipo extends javax.swing.JFrame {
                                 .addComponent(lblTipo)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                 .addComponent(lblTipo_)))))
-                .addContainerGap(207, Short.MAX_VALUE))
+                .addContainerGap(417, Short.MAX_VALUE))
         );
         pnlDatosLayout.setVerticalGroup(
             pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -381,10 +370,10 @@ public class BuscarEquipo extends javax.swing.JFrame {
                     .addComponent(lblModelo_)
                     .addComponent(lblMac)
                     .addComponent(lblMac_))
-                .addContainerGap(16, Short.MAX_VALUE))
+                .addContainerGap(17, Short.MAX_VALUE))
         );
 
-        getContentPane().add(pnlDatos, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 620, 140));
+        getContentPane().add(pnlDatos, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 180, 830, 140));
 
         pnlInventario.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Inventario toner", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.TOP, new java.awt.Font("Arial", 0, 14), new java.awt.Color(255, 255, 255))); // NOI18N
         pnlInventario.setOpaque(false);
@@ -471,7 +460,7 @@ public class BuscarEquipo extends javax.swing.JFrame {
                 .addGap(0, 5, Short.MAX_VALUE))
         );
 
-        getContentPane().add(pnlInventario, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 180, 200, 140));
+        getContentPane().add(pnlInventario, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 20, 200, 140));
 
         pnlTabla.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Historial", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 14), new java.awt.Color(255, 255, 255))); // NOI18N
         pnlTabla.setOpaque(false);
@@ -519,7 +508,7 @@ public class BuscarEquipo extends javax.swing.JFrame {
         getContentPane().add(pnlTabla, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 330, 830, 210));
 
         lblFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/FondoBuscarNS.png"))); // NOI18N
-        getContentPane().add(lblFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
+        getContentPane().add(lblFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 850, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -547,10 +536,7 @@ public class BuscarEquipo extends javax.swing.JFrame {
                 JButton btn = (JButton)o;
                 System.out.println("PATH: "+tabla.getValueAt(fila,5));
                 pathDescarga =  String.valueOf(tabla.getValueAt(fila, 5));
-                BusyLabel.setText("Descargando Archivo");
-                BusyLabel.setBusy(true);
                 bajarArchivoSFTP();
-                BusyLabel.setText("Abriendo Archivo");
                 abrirArchivo();
             }
         }
@@ -572,27 +558,20 @@ public class BuscarEquipo extends javax.swing.JFrame {
                     break;
                 }
             }
-        } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(BuscarEquipo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(BuscarEquipo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(BuscarEquipo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
-        } catch (javax.swing.UnsupportedLookAndFeelException ex) {
+        } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
             java.util.logging.Logger.getLogger(BuscarEquipo.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        
+        //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new BuscarEquipo().setVisible(true);
-            }
+        java.awt.EventQueue.invokeLater(() -> {
+            new BuscarEquipo().setVisible(true);
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private org.jdesktop.swingx.JXBusyLabel BusyLabel;
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnLogOut;
     private javax.swing.JScrollPane jScrollPane1;
