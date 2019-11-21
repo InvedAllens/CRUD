@@ -10,8 +10,17 @@ import java.io.IOException;
  *
  * @author Ruben Angeles
  */
-public class SFTPBajarArchivo {
+public class SFTPBajarArchivo implements Runnable{
     private Session session;
+    private final SFTPConnector connector = new SFTPConnector();
+    private String path;
+
+    public SFTPBajarArchivo(String path) {
+        this.path = path;
+    }
+    
+    
+    
     /**
      * Funcion que Permite descargar un archivo 
      * @param src es el path del archivo a descargar
@@ -31,4 +40,18 @@ public class SFTPBajarArchivo {
             throw new IllegalAccessException("No Existe sesion SFTP iniciada");
         }
     }
+
+    @Override
+    public void run() {
+        try {
+            System.out.println("conectando.....");
+            connector.connect("archivo", "soportemx", "192.168.40.15", 22);
+            System.out.println("Conectado");
+            getFile(path);
+            
+        } catch (JSchException | SftpException | IllegalAccessException | IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
 }
