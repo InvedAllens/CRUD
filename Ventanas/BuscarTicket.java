@@ -9,10 +9,14 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import db.Conexion;
+import ftp.SFTPBajarArchivo;
 import ftp.SFTPConnector;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Observable;
+import java.util.Observer;
+import javax.swing.JTextField;
 import misc.Ticket;
 import misc.Usuario;
 
@@ -20,11 +24,12 @@ import misc.Usuario;
  *
  * @author Ruben Angeles
  */
-public class BuscarTicket extends javax.swing.JFrame {
+public class BuscarTicket extends javax.swing.JFrame implements Observer {
 
     public Usuario usuario = Opciones.usuario;
     private Ticket t = new Ticket();
     public Conexion cn = new Conexion();
+    private Thread th;
     ResultSet rs;
 
     /**
@@ -33,6 +38,7 @@ public class BuscarTicket extends javax.swing.JFrame {
     public BuscarTicket() {
         initComponents();
         this.setLocationRelativeTo(null);
+        busyLabel.setVisible(false);
         llenarTicket();
     }
 
@@ -182,6 +188,7 @@ public class BuscarTicket extends javax.swing.JFrame {
         lblFecha = new javax.swing.JLabel();
         lblFecha_ = new javax.swing.JLabel();
         btnVerArchivo = new javax.swing.JButton();
+        busyLabel = new org.jdesktop.swingx.JXBusyLabel();
         lblFondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -549,6 +556,11 @@ public class BuscarTicket extends javax.swing.JFrame {
 
         getContentPane().add(pnlDetalles, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 340, 830, 200));
 
+        busyLabel.setForeground(new java.awt.Color(255, 255, 255));
+        busyLabel.setText("Cargando...");
+        busyLabel.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        getContentPane().add(busyLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 110, -1, -1));
+
         lblFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/FondoBuscarNS.png"))); // NOI18N
         getContentPane().add(lblFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 850, -1));
 
@@ -569,9 +581,17 @@ public class BuscarTicket extends javax.swing.JFrame {
     }//GEN-LAST:event_btnBuscarActionPerformed
 
     private void btnVerArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerArchivoActionPerformed
-        
-        bajarArchivoSFTP();
-        abrirArchivo();
+        if (!es.discoduroderoer.swing.Validacion.comprobarVacios(new JTextField[]{tfTicket})) {
+            busyLabel.setVisible(true);
+            busyLabel.setBusy(true);
+            btnVerArchivo.setEnabled(false);
+            SFTPBajarArchivo bajarArchivo = new SFTPBajarArchivo(t.getPath());
+            bajarArchivo.addObserver(this);
+            th = new Thread(bajarArchivo);
+            th.start();
+        }else{
+            javax.swing.JOptionPane.showMessageDialog(rootPane, "Campo de Ticket Vacio");
+        }
     }//GEN-LAST:event_btnVerArchivoActionPerformed
 
     /**
@@ -607,6 +627,7 @@ public class BuscarTicket extends javax.swing.JFrame {
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnLogOut;
     private javax.swing.JButton btnVerArchivo;
+    private org.jdesktop.swingx.JXBusyLabel busyLabel;
     private javax.swing.JLabel lblDetalles;
     private javax.swing.JLabel lblDetalles_;
     private javax.swing.JLabel lblFecha;
@@ -647,4 +668,14 @@ public class BuscarTicket extends javax.swing.JFrame {
     private javax.swing.JPanel pnlInventario;
     private javax.swing.JTextField tfTicket;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void update(Observable o, Object arg) {
+        boolean flag = (boolean) arg;
+        if (flag == false) {
+            btnVerArchivo.setEnabled(true);
+            busyLabel.setVisible(false);
+            busyLabel.setBusy(false);
+        }
+    }
 }

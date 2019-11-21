@@ -9,10 +9,13 @@ import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import db.Conexion;
+import ftp.SFTPBajarArchivo;
 import ftp.SFTPConnector;
 import java.io.IOException;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Observable;
+import java.util.Observer;
 import javax.swing.JButton;
 import javax.swing.table.DefaultTableModel;
 import misc.Render;
@@ -22,9 +25,10 @@ import misc.Usuario;
  *
  * @author Ruben Angeles
  */
-public class BuscarEquipo extends javax.swing.JFrame {
+public class BuscarEquipo extends javax.swing.JFrame implements Observer{
     public Usuario usuario = Opciones.usuario;
     public Conexion cn = new Conexion();
+    private Thread th;
     ResultSet rs;
     DefaultTableModel modelo = new DefaultTableModel(){
     @Override
@@ -40,6 +44,7 @@ public class BuscarEquipo extends javax.swing.JFrame {
         initComponents();
         this.setLocationRelativeTo(null);
         llenarNS();
+        busyLabel.setVisible(false);
     }
     /**
      *  Metodo para Obtener NS de la BD y agregarlos al TextAutoCompleter
@@ -189,6 +194,7 @@ public class BuscarEquipo extends javax.swing.JFrame {
         pnlTabla = new javax.swing.JPanel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tabla = new javax.swing.JTable();
+        busyLabel = new org.jdesktop.swingx.JXBusyLabel();
         lblFondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -507,6 +513,11 @@ public class BuscarEquipo extends javax.swing.JFrame {
 
         getContentPane().add(pnlTabla, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 330, 830, 210));
 
+        busyLabel.setForeground(new java.awt.Color(255, 255, 255));
+        busyLabel.setText("Cargando...");
+        busyLabel.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        getContentPane().add(busyLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 110, -1, -1));
+
         lblFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/FondoBuscarNS.png"))); // NOI18N
         getContentPane().add(lblFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 850, -1));
 
@@ -536,8 +547,12 @@ public class BuscarEquipo extends javax.swing.JFrame {
                 JButton btn = (JButton)o;
                 System.out.println("PATH: "+tabla.getValueAt(fila,5));
                 pathDescarga =  String.valueOf(tabla.getValueAt(fila, 5));
-                bajarArchivoSFTP();
-                abrirArchivo();
+                busyLabel.setVisible(true);
+                busyLabel.setBusy(true);
+                SFTPBajarArchivo bajarArchivo = new SFTPBajarArchivo(pathDescarga);
+                bajarArchivo.addObserver(this);
+                th = new Thread(bajarArchivo);
+                th.start();
             }
         }
     }//GEN-LAST:event_tablaMouseClicked
@@ -574,6 +589,7 @@ public class BuscarEquipo extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnBuscar;
     private javax.swing.JButton btnLogOut;
+    private org.jdesktop.swingx.JXBusyLabel busyLabel;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JLabel lblFondo;
     private javax.swing.JLabel lblIP;
@@ -608,4 +624,13 @@ public class BuscarEquipo extends javax.swing.JFrame {
     private javax.swing.JTable tabla;
     private javax.swing.JTextField tfNS;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void update(Observable o, Object arg) {
+        boolean flag = (boolean)arg;
+        if (flag == false) {
+            busyLabel.setVisible(false);
+            busyLabel.setBusy(false);
+        }
+    }
 }
