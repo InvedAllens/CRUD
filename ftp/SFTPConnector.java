@@ -15,16 +15,18 @@ public class SFTPConnector {
      * @param password Contraseña
      * @param host Host a conectar
      * @param port Puerto del host
+     * @return Se devuelve la sesion abierta.
      * @throws JSchException Cualquier Error al establecer conexion SFTP
      * @throws IllegalAccessException Indcica que ya existe una conexion SFTP establecida
      */
-    public void connect(String username,String password,String host,int port) throws JSchException, IllegalAccessException{
+    public Session connect(String username,String password,String host,int port) throws JSchException, IllegalAccessException{
         if (this.session == null || !this.session.isConnected()) {
             JSch jSch = new JSch();
             this.session = jSch.getSession(username, host, port);
             this.session.setPassword(password);
             this.session.setConfig("StrictHostKeyChecking", "no");
             this.session.connect();
+            return session;
         }else{
             throw new IllegalAccessException("Sesion SFTP ya iniciada");
         }
