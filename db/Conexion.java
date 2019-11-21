@@ -44,10 +44,10 @@ public class Conexion {
         return rs;
     }
     public void insertar(String query) throws SQLException{
-        //System.out.println("Preparando el Query");
+        System.out.println("Preparando el Query");
         Statement s = link.createStatement();
         s.executeUpdate(query);
-        //System.out.println("Query ejecutado con Exito");
+        System.out.println("Query ejecutado con Exito");
     }
     public void update(String query) throws SQLException{
         //System.out.println("Preparando el Query");
