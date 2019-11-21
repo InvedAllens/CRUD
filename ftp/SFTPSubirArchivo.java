@@ -10,8 +10,19 @@ import java.io.IOException;
  *
  * @author Ruben Angeles
  */
-public class SFTPSubirArchivo {
-     private Session session;
+public class SFTPSubirArchivo implements Runnable {
+    private Session session;
+    private final SFTPConnector connector = new SFTPConnector();
+    private String ftpPath,filePath,fileName;
+
+    public SFTPSubirArchivo(String ftpPath, String filePath, String fileName) {
+        this.ftpPath = ftpPath;
+        this.filePath = filePath;
+        this.fileName = fileName;
+    }
+    
+    
+    
     /**
      * Añade un archivo al directorio FTP usando SFTP.
      * @param ftpPath Path del directorio FTP o destino.
@@ -36,4 +47,19 @@ public class SFTPSubirArchivo {
             throw new IllegalAccessException("No Existe sesion SFTP iniciada");
         }
     }
+
+    @Override
+    public void run() {
+        try {
+            System.out.println("conectando.....");
+            connector.connect("archivo", "soportemx", "192.168.40.15", 22);
+            System.out.println("Conectado");
+            addFile(ftpPath, filePath, fileName);
+            
+        } catch (JSchException | SftpException | IllegalAccessException | IOException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+    
+    
 }
