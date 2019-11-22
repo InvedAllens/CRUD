@@ -73,8 +73,10 @@ public class SFTPSubirArchivo extends Observable implements Runnable {
                 connector.connect("archivo", "soportemx", "192.168.40.15", 22);
                 System.out.println("Conectado");
                 addFile(this.fichero);
+                connector.disconnect();
                 cn.conectar();
                 cn.insertar("INSERT INTO Docs(ns,fecha,ticket,detalle,observaciones,path) VALUES ('"+ticket.getNs()+"','"+ticket.getFecha()+"','"+ticket.getTicket()+"','"+ticket.getDetalle()+"','"+ticket.getObservaciones()+"','"+pathDestino+"')");
+                cn.desconectar();
             } catch (JSchException | SftpException | IllegalAccessException | IOException | SQLException e) {
                 System.out.println(e.getMessage());
             } 

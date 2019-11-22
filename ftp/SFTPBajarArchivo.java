@@ -59,6 +59,7 @@ public class SFTPBajarArchivo extends Observable implements Runnable {
                 this.session = connector.connect("archivo", "soportemx", "192.168.40.15", 22);
                 System.out.println("Conectado");
                 getFile(path);
+                connector.disconnect();
                 //Las siguientes 3 lineas son para abrir el archivo pdf
                 ProcessBuilder pb = new ProcessBuilder();
                 pb.command("cmd.exe", "/c", "C:\\Users\\Ruben Angeles\\Desktop\\Scan\\temp.pdf");
