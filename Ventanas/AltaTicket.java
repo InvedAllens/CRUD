@@ -36,6 +36,13 @@ public class AltaTicket extends javax.swing.JFrame {
 
         btnLogOut = new javax.swing.JButton();
         lblTitulo = new javax.swing.JLabel();
+        pnlDatos1 = new javax.swing.JPanel();
+        lblCheckNS = new javax.swing.JLabel();
+        lblCheckFecha = new javax.swing.JLabel();
+        lblCheckTicket = new javax.swing.JLabel();
+        lblCheckDetalles = new javax.swing.JLabel();
+        lblCheckObservaciones = new javax.swing.JLabel();
+        lblArchivoSeleccionado = new javax.swing.JLabel();
         pnlDatos = new javax.swing.JPanel();
         lblSerie = new javax.swing.JLabel();
         lblFecha = new javax.swing.JLabel();
@@ -43,7 +50,6 @@ public class AltaTicket extends javax.swing.JFrame {
         lblDetalles = new javax.swing.JLabel();
         lblObservaciones = new javax.swing.JLabel();
         lblArchivo = new javax.swing.JLabel();
-        lblArchivo_ = new javax.swing.JLabel();
         tfSerie = new javax.swing.JTextField();
         DatePicker = new org.jdesktop.swingx.JXDatePicker();
         tfTicket = new javax.swing.JTextField();
@@ -67,12 +73,73 @@ public class AltaTicket extends javax.swing.JFrame {
                 btnLogOutActionPerformed(evt);
             }
         });
-        getContentPane().add(btnLogOut, new org.netbeans.lib.awtextra.AbsoluteConstraints(770, 10, -1, -1));
+        getContentPane().add(btnLogOut, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 10, -1, -1));
 
         lblTitulo.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
         lblTitulo.setForeground(new java.awt.Color(255, 255, 255));
         lblTitulo.setText("Alta Ticket");
-        getContentPane().add(lblTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 20, -1, -1));
+        getContentPane().add(lblTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 20, -1, -1));
+
+        pnlDatos1.setOpaque(false);
+
+        lblCheckNS.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblCheckNS.setForeground(new java.awt.Color(255, 255, 255));
+        lblCheckNS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/check32.png"))); // NOI18N
+
+        lblCheckFecha.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblCheckFecha.setForeground(new java.awt.Color(255, 255, 255));
+        lblCheckFecha.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/check32.png"))); // NOI18N
+
+        lblCheckTicket.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblCheckTicket.setForeground(new java.awt.Color(255, 255, 255));
+        lblCheckTicket.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/check32.png"))); // NOI18N
+
+        lblCheckDetalles.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblCheckDetalles.setForeground(new java.awt.Color(255, 255, 255));
+        lblCheckDetalles.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/check32.png"))); // NOI18N
+
+        lblCheckObservaciones.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblCheckObservaciones.setForeground(new java.awt.Color(255, 255, 255));
+        lblCheckObservaciones.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/check32.png"))); // NOI18N
+
+        lblArchivoSeleccionado.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblArchivoSeleccionado.setForeground(new java.awt.Color(255, 255, 255));
+        lblArchivoSeleccionado.setText("Archivo No Seleccionado");
+
+        javax.swing.GroupLayout pnlDatos1Layout = new javax.swing.GroupLayout(pnlDatos1);
+        pnlDatos1.setLayout(pnlDatos1Layout);
+        pnlDatos1Layout.setHorizontalGroup(
+            pnlDatos1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDatos1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlDatos1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lblArchivoSeleccionado)
+                    .addComponent(lblCheckNS)
+                    .addComponent(lblCheckFecha)
+                    .addComponent(lblCheckTicket)
+                    .addComponent(lblCheckDetalles)
+                    .addComponent(lblCheckObservaciones))
+                .addContainerGap(43, Short.MAX_VALUE))
+        );
+        pnlDatos1Layout.setVerticalGroup(
+            pnlDatos1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDatos1Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(lblCheckNS, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(lblCheckFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addComponent(lblCheckTicket, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addComponent(lblCheckDetalles, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addComponent(lblCheckObservaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(18, 18, 18)
+                .addComponent(lblArchivoSeleccionado, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(69, 69, 69))
+        );
+
+        getContentPane().add(pnlDatos1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 100, 210, 250));
 
         pnlDatos.setOpaque(false);
 
@@ -100,11 +167,6 @@ public class AltaTicket extends javax.swing.JFrame {
         lblArchivo.setForeground(new java.awt.Color(255, 255, 255));
         lblArchivo.setText("Archivo:");
 
-        lblArchivo_.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lblArchivo_.setForeground(new java.awt.Color(255, 255, 255));
-        lblArchivo_.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblArchivo_.setText("Archivo No Seleccionado");
-
         tfSerie.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         tfSerie.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
@@ -120,7 +182,7 @@ public class AltaTicket extends javax.swing.JFrame {
         tfObservaciones.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         btnArchivo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        btnArchivo.setText("Seleccionarr Archivo");
+        btnArchivo.setText("Seleccionar Archivo");
         btnArchivo.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
         btnArchivo.setOpaque(false);
 
@@ -138,20 +200,14 @@ public class AltaTicket extends javax.swing.JFrame {
                     .addComponent(lblObservaciones, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(lblArchivo, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addGap(18, 18, 18)
-                .addGroup(pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlDatosLayout.createSequentialGroup()
-                        .addGap(10, 10, 10)
-                        .addComponent(lblArchivo_)
-                        .addContainerGap(32, Short.MAX_VALUE))
-                    .addGroup(pnlDatosLayout.createSequentialGroup()
-                        .addGroup(pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                            .addComponent(tfSerie, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
-                            .addComponent(DatePicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(tfTicket, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
-                            .addComponent(tfDetalles, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
-                            .addComponent(tfObservaciones, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
-                            .addComponent(btnArchivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                        .addGap(0, 0, Short.MAX_VALUE))))
+                .addGroup(pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(tfSerie, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
+                    .addComponent(DatePicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(tfTicket, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
+                    .addComponent(tfDetalles, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
+                    .addComponent(tfObservaciones, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
+                    .addComponent(btnArchivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(0, 20, Short.MAX_VALUE))
         );
         pnlDatosLayout.setVerticalGroup(
             pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -180,12 +236,10 @@ public class AltaTicket extends javax.swing.JFrame {
                 .addGroup(pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(lblArchivo_)
-                .addGap(46, 46, 46))
+                .addGap(69, 69, 69))
         );
 
-        getContentPane().add(pnlDatos, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, 380, 290));
+        getContentPane().add(pnlDatos, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, 380, 260));
 
         pnlBotones.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Opciones", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 14), new java.awt.Color(255, 255, 255))); // NOI18N
         pnlBotones.setForeground(new java.awt.Color(255, 255, 255));
@@ -207,10 +261,10 @@ public class AltaTicket extends javax.swing.JFrame {
         btnLimpiar1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
         pnlBotones.add(btnLimpiar1);
 
-        getContentPane().add(pnlBotones, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 410, 310, 110));
+        getContentPane().add(pnlBotones, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 380, 310, 110));
 
-        lblFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/FondoBuscarNS.png"))); // NOI18N
-        getContentPane().add(lblFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 850, -1));
+        lblFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/fondoAlta.png"))); // NOI18N
+        getContentPane().add(lblFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 630, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -264,7 +318,12 @@ public class AltaTicket extends javax.swing.JFrame {
     private javax.swing.JButton btnLimpiar1;
     private javax.swing.JButton btnLogOut;
     private javax.swing.JLabel lblArchivo;
-    private javax.swing.JLabel lblArchivo_;
+    private javax.swing.JLabel lblArchivoSeleccionado;
+    private javax.swing.JLabel lblCheckDetalles;
+    private javax.swing.JLabel lblCheckFecha;
+    private javax.swing.JLabel lblCheckNS;
+    private javax.swing.JLabel lblCheckObservaciones;
+    private javax.swing.JLabel lblCheckTicket;
     private javax.swing.JLabel lblDetalles;
     private javax.swing.JLabel lblFecha;
     private javax.swing.JLabel lblFondo;
@@ -274,6 +333,7 @@ public class AltaTicket extends javax.swing.JFrame {
     private javax.swing.JLabel lblTitulo;
     private javax.swing.JPanel pnlBotones;
     private javax.swing.JPanel pnlDatos;
+    private javax.swing.JPanel pnlDatos1;
     private javax.swing.JTextField tfDetalles;
     private javax.swing.JTextField tfObservaciones;
     private javax.swing.JTextField tfSerie;
