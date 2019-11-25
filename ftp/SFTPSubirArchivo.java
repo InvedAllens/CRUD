@@ -1,15 +1,13 @@
 package ftp;
 
+import ConexionFTP.SFTPConnector;
 import com.jcraft.jsch.ChannelSftp;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.Session;
 import com.jcraft.jsch.SftpException;
-import db.Conexion;
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.Observable;
-import misc.Ticket;
 
 /**
  *
@@ -18,16 +16,16 @@ import misc.Ticket;
 public class SFTPSubirArchivo extends Observable implements Runnable {
 
     private Session session;
-    private final SFTPConnector connector = new SFTPConnector();
-    Conexion cn = new Conexion();
-    private String pathDestino;
     private boolean flag;
     private final File fichero;
-    private final Ticket ticket;
 
-    public SFTPSubirArchivo(File fichero,Ticket ticket) {
+    
+    public SFTPSubirArchivo() {
+        this.fichero = null;
+    }
+
+    public SFTPSubirArchivo(File fichero) {
         this.fichero = fichero;
-        this.ticket = ticket;
     }
 
     
@@ -58,7 +56,6 @@ public class SFTPSubirArchivo extends Observable implements Runnable {
             System.out.println("Archivo subido Exitosamente");
             channelSftp.exit();
             channelSftp.disconnect();
-            this.pathDestino = "/home/archivo/"+fichero.getName();
         } else {
             throw new IllegalAccessException("No Existe sesion SFTP iniciada");
         }
@@ -69,20 +66,17 @@ public class SFTPSubirArchivo extends Observable implements Runnable {
         this.flag = true;
         while (flag) {
             try {
+                SFTPConnector connector = new SFTPConnector("archivo", "soportemx", "192.168.40.15");
                 System.out.println("conectando.....");
-                connector.connect("archivo", "soportemx", "192.168.40.15", 22);
+                this.session = connector.connect();
                 System.out.println("Conectado");
                 addFile(this.fichero);
                 connector.disconnect();
-                cn.conectar();
-                cn.insertar("INSERT INTO Docs(ns,fecha,ticket,detalle,observaciones,path) VALUES ('"+ticket.getNs()+"','"+ticket.getFecha()+"','"+ticket.getTicket()+"','"+ticket.getDetalle()+"','"+ticket.getObservaciones()+"','"+pathDestino+"')");
-                cn.desconectar();
-            } catch (JSchException | SftpException | IllegalAccessException | IOException | SQLException e) {
+            } catch (JSchException | SftpException | IllegalAccessException | IOException  e) {
                 System.out.println(e.getMessage());
             } 
             this.flag = false;
         }
-        javax.swing.JOptionPane.showMessageDialog(null, "Registro Creado Exitosamente");
         this.setChanged();
         this.notifyObservers(flag);
         this.clearChanged();
