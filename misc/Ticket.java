@@ -1,12 +1,28 @@
 package misc;
 
-import java.sql.Date;
+import java.util.Date;
 
 /**
  *
  * @author Ruben Angeles
  */
 public class Ticket {
+
+    public Ticket(int ticket, String ns, String detalle, String observaciones, String path, Date fecha) {
+        this.ticket = ticket;
+        this.ns = ns;
+        this.detalle = detalle;
+        this.observaciones = observaciones;
+        this.path = path;
+        this.fecha = fecha;
+    }
+
+    public Ticket() {
+    }
+       
+    /**
+     * SETTERS && GETTERS
+     */
     
     /**
      * @return the id
