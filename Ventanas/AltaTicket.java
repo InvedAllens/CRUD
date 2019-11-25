@@ -1,28 +1,52 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Ventanas;
 
-import db.Conexion;
+import ConexionFTPconThreads.SFTPSubirArchivo;
+import ConexionSQL.ConexionMYSQL;
+import com.mxrck.autocompleter.TextAutoCompleter;
+import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.geom.Rectangle2D;
+import java.io.File;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Observable;
+import java.util.Observer;
+import javax.swing.JFileChooser;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import javax.swing.filechooser.FileNameExtensionFilter;
+import misc.Ticket;
 import misc.Usuario;
+import org.jdesktop.swingx.JXBusyLabel;
+import org.jdesktop.swingx.icon.EmptyIcon;
+import org.jdesktop.swingx.painter.BusyPainter;
 
 /**
  *
  * @author Ruben Angeles
  */
-public class AltaTicket extends javax.swing.JFrame {
-    
+public class AltaTicket extends javax.swing.JFrame implements Observer {
+
     public Usuario usuario = Opciones.usuario;
-    public Conexion cn = new Conexion();
+    private File fichero;
+    private final ConexionMYSQL cn = new ConexionMYSQL("192.168.40.15", "ABC", "consultas", "soportemx");
     private Thread th;
-    
+    Ticket t;
+    private String pathDestino;
+    private ResultSet rs;
+
     /**
      * Creates new form AltaTicket
      */
     public AltaTicket() {
         initComponents();
+        this.setLocationRelativeTo(null);
+        llenarNS();
+        BusyLabel.setVisible(false);
     }
 
     /**
@@ -34,15 +58,9 @@ public class AltaTicket extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        BusyLabel = createComplexBusyLabel();
         btnLogOut = new javax.swing.JButton();
         lblTitulo = new javax.swing.JLabel();
-        pnlDatos1 = new javax.swing.JPanel();
-        lblCheckNS = new javax.swing.JLabel();
-        lblCheckFecha = new javax.swing.JLabel();
-        lblCheckTicket = new javax.swing.JLabel();
-        lblCheckDetalles = new javax.swing.JLabel();
-        lblCheckObservaciones = new javax.swing.JLabel();
-        lblArchivoSeleccionado = new javax.swing.JLabel();
         pnlDatos = new javax.swing.JPanel();
         lblSerie = new javax.swing.JLabel();
         lblFecha = new javax.swing.JLabel();
@@ -56,13 +74,23 @@ public class AltaTicket extends javax.swing.JFrame {
         tfDetalles = new javax.swing.JTextField();
         tfObservaciones = new javax.swing.JTextField();
         btnArchivo = new javax.swing.JButton();
+        lblArchivoSeleccionado = new javax.swing.JLabel();
         pnlBotones = new javax.swing.JPanel();
         btnLimpiar = new javax.swing.JButton();
-        btnLimpiar1 = new javax.swing.JButton();
+        btnEnviar = new javax.swing.JButton();
         lblFondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        BusyLabel.setForeground(new java.awt.Color(255, 255, 255));
+        BusyLabel.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        BusyLabel.setToolTipText("");
+        BusyLabel.setFocusable(false);
+        BusyLabel.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        BusyLabel.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        getContentPane().add(BusyLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 210, -1, -1));
 
         btnLogOut.setBackground(new java.awt.Color(153, 204, 255));
         btnLogOut.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/exit32.png"))); // NOI18N
@@ -73,75 +101,19 @@ public class AltaTicket extends javax.swing.JFrame {
                 btnLogOutActionPerformed(evt);
             }
         });
-        getContentPane().add(btnLogOut, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 10, -1, -1));
+        getContentPane().add(btnLogOut, new org.netbeans.lib.awtextra.AbsoluteConstraints(420, 10, -1, -1));
 
         lblTitulo.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
         lblTitulo.setForeground(new java.awt.Color(255, 255, 255));
         lblTitulo.setText("Alta Ticket");
-        getContentPane().add(lblTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(210, 20, -1, -1));
-
-        pnlDatos1.setOpaque(false);
-
-        lblCheckNS.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lblCheckNS.setForeground(new java.awt.Color(255, 255, 255));
-        lblCheckNS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/check32.png"))); // NOI18N
-
-        lblCheckFecha.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lblCheckFecha.setForeground(new java.awt.Color(255, 255, 255));
-        lblCheckFecha.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/check32.png"))); // NOI18N
-
-        lblCheckTicket.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lblCheckTicket.setForeground(new java.awt.Color(255, 255, 255));
-        lblCheckTicket.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/check32.png"))); // NOI18N
-
-        lblCheckDetalles.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lblCheckDetalles.setForeground(new java.awt.Color(255, 255, 255));
-        lblCheckDetalles.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/check32.png"))); // NOI18N
-
-        lblCheckObservaciones.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lblCheckObservaciones.setForeground(new java.awt.Color(255, 255, 255));
-        lblCheckObservaciones.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/check32.png"))); // NOI18N
-
-        lblArchivoSeleccionado.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lblArchivoSeleccionado.setForeground(new java.awt.Color(255, 255, 255));
-        lblArchivoSeleccionado.setText("Archivo No Seleccionado");
-
-        javax.swing.GroupLayout pnlDatos1Layout = new javax.swing.GroupLayout(pnlDatos1);
-        pnlDatos1.setLayout(pnlDatos1Layout);
-        pnlDatos1Layout.setHorizontalGroup(
-            pnlDatos1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlDatos1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlDatos1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblArchivoSeleccionado)
-                    .addComponent(lblCheckNS)
-                    .addComponent(lblCheckFecha)
-                    .addComponent(lblCheckTicket)
-                    .addComponent(lblCheckDetalles)
-                    .addComponent(lblCheckObservaciones))
-                .addContainerGap(43, Short.MAX_VALUE))
-        );
-        pnlDatos1Layout.setVerticalGroup(
-            pnlDatos1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlDatos1Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(lblCheckNS, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(lblCheckFecha, javax.swing.GroupLayout.PREFERRED_SIZE, 25, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, Short.MAX_VALUE)
-                .addComponent(lblCheckTicket, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, Short.MAX_VALUE)
-                .addComponent(lblCheckDetalles, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, Short.MAX_VALUE)
-                .addComponent(lblCheckObservaciones, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addComponent(lblArchivoSeleccionado, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(69, 69, 69))
-        );
-
-        getContentPane().add(pnlDatos1, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 100, 210, 250));
+        getContentPane().add(lblTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 10, -1, -1));
 
         pnlDatos.setOpaque(false);
+        pnlDatos.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                pnlDatosKeyReleased(evt);
+            }
+        });
 
         lblSerie.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         lblSerie.setForeground(new java.awt.Color(255, 255, 255));
@@ -183,8 +155,17 @@ public class AltaTicket extends javax.swing.JFrame {
 
         btnArchivo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         btnArchivo.setText("Seleccionar Archivo");
-        btnArchivo.setBorder(new javax.swing.border.SoftBevelBorder(javax.swing.border.BevelBorder.RAISED));
+        btnArchivo.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
         btnArchivo.setOpaque(false);
+        btnArchivo.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnArchivoActionPerformed(evt);
+            }
+        });
+
+        lblArchivoSeleccionado.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblArchivoSeleccionado.setForeground(new java.awt.Color(255, 255, 255));
+        lblArchivoSeleccionado.setText("Archivo No Seleccionado");
 
         javax.swing.GroupLayout pnlDatosLayout = new javax.swing.GroupLayout(pnlDatos);
         pnlDatos.setLayout(pnlDatosLayout);
@@ -200,13 +181,17 @@ public class AltaTicket extends javax.swing.JFrame {
                     .addComponent(lblObservaciones, javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(lblArchivo, javax.swing.GroupLayout.Alignment.TRAILING))
                 .addGap(18, 18, 18)
-                .addGroup(pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(tfSerie, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
-                    .addComponent(DatePicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(tfTicket, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
-                    .addComponent(tfDetalles, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
-                    .addComponent(tfObservaciones, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
-                    .addComponent(btnArchivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGroup(pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlDatosLayout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(lblArchivoSeleccionado))
+                    .addGroup(pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(tfSerie, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
+                        .addComponent(DatePicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(tfTicket, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
+                        .addComponent(tfDetalles, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
+                        .addComponent(tfObservaciones, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
+                        .addComponent(btnArchivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
                 .addGap(0, 20, Short.MAX_VALUE))
         );
         pnlDatosLayout.setVerticalGroup(
@@ -236,10 +221,12 @@ public class AltaTicket extends javax.swing.JFrame {
                 .addGroup(pnlDatosLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(69, 69, 69))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblArchivoSeleccionado, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(40, 40, 40))
         );
 
-        getContentPane().add(pnlDatos, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, 380, 260));
+        getContentPane().add(pnlDatos, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 100, 380, 300));
 
         pnlBotones.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Opciones", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 14), new java.awt.Color(255, 255, 255))); // NOI18N
         pnlBotones.setForeground(new java.awt.Color(255, 255, 255));
@@ -251,20 +238,30 @@ public class AltaTicket extends javax.swing.JFrame {
         btnLimpiar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
         btnLimpiar.setOpaque(false);
         btnLimpiar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
         pnlBotones.add(btnLimpiar);
 
-        btnLimpiar1.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        btnLimpiar1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/check32.png"))); // NOI18N
-        btnLimpiar1.setText("Enviar");
-        btnLimpiar1.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        btnLimpiar1.setOpaque(false);
-        btnLimpiar1.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
-        pnlBotones.add(btnLimpiar1);
+        btnEnviar.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        btnEnviar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/check32.png"))); // NOI18N
+        btnEnviar.setText("Enviar");
+        btnEnviar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnEnviar.setOpaque(false);
+        btnEnviar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnEnviar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEnviarActionPerformed(evt);
+            }
+        });
+        pnlBotones.add(btnEnviar);
 
-        getContentPane().add(pnlBotones, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 380, 310, 110));
+        getContentPane().add(pnlBotones, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 400, 310, 110));
 
         lblFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/fondoAlta.png"))); // NOI18N
-        getContentPane().add(lblFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 630, -1));
+        getContentPane().add(lblFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 520, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -275,6 +272,59 @@ public class AltaTicket extends javax.swing.JFrame {
         o.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_btnLogOutActionPerformed
+
+    private void pnlDatosKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_pnlDatosKeyReleased
+
+    }//GEN-LAST:event_pnlDatosKeyReleased
+
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        limpiarCampos();
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+
+    private void btnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarActionPerformed
+        if (validacion()) {
+            btnArchivo.setEnabled(false);
+            btnEnviar.setEnabled(false);
+            BusyLabel.setBusy(true);
+            BusyLabel.setText("Obteniendo Datos");
+            BusyLabel.setVisible(true);
+            getDatos();
+            BusyLabel.setText("Subiendo Archivo");
+            SFTPSubirArchivo up = new SFTPSubirArchivo(fichero);
+            up.addObserver(this);
+            th = new Thread(up);
+            th.start();
+            cn.connect();
+            try{
+                cn.executeQuery("INSERT INTO Docs(ns,fecha,ticket,detalle,observaciones,path) VALUES ('"+t.getNs()+"','"+devolverFecha()+"','"+t.getTicket()+"','"+t.getDetalle()+"','"+t.getObservaciones()+"','"+pathDestino+"')");
+                cn.disconnect();
+            }catch(SQLException e){
+                System.out.println(e.getMessage());
+            }
+        } else {
+        }
+    }//GEN-LAST:event_btnEnviarActionPerformed
+
+    private void btnArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnArchivoActionPerformed
+        //Creamos el objeto JFileChooser
+        JFileChooser fc = new JFileChooser();
+        fc.setFileFilter(new FileNameExtensionFilter("PDF", "pdf"));
+        fc.setDialogTitle("SELECCIONAR UN ARCHIVO");
+        JPanel contentPane = new JPanel();
+        contentPane.setLayout(null);
+        //Abrimos la ventana, guardamos la opcion seleccionada por el usuario
+        int seleccion = fc.showOpenDialog(contentPane);
+        //Si el usuario, pincha en aceptar
+        if (seleccion == JFileChooser.APPROVE_OPTION) {
+            //Seleccionamos el fichero
+            fichero = fc.getSelectedFile();
+            //Ecribe la ruta del fichero seleccionado en el campo de texto
+            lblArchivoSeleccionado.setText(fichero.getName());
+            //Escribe El path de origen
+            System.out.println("Archivo selecionado: " + fichero.getAbsolutePath());
+        }
+        //validacion();
+    }//GEN-LAST:event_btnArchivoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -312,18 +362,14 @@ public class AltaTicket extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private org.jdesktop.swingx.JXBusyLabel BusyLabel;
     private org.jdesktop.swingx.JXDatePicker DatePicker;
     private javax.swing.JButton btnArchivo;
+    private javax.swing.JButton btnEnviar;
     private javax.swing.JButton btnLimpiar;
-    private javax.swing.JButton btnLimpiar1;
     private javax.swing.JButton btnLogOut;
     private javax.swing.JLabel lblArchivo;
     private javax.swing.JLabel lblArchivoSeleccionado;
-    private javax.swing.JLabel lblCheckDetalles;
-    private javax.swing.JLabel lblCheckFecha;
-    private javax.swing.JLabel lblCheckNS;
-    private javax.swing.JLabel lblCheckObservaciones;
-    private javax.swing.JLabel lblCheckTicket;
     private javax.swing.JLabel lblDetalles;
     private javax.swing.JLabel lblFecha;
     private javax.swing.JLabel lblFondo;
@@ -333,10 +379,141 @@ public class AltaTicket extends javax.swing.JFrame {
     private javax.swing.JLabel lblTitulo;
     private javax.swing.JPanel pnlBotones;
     private javax.swing.JPanel pnlDatos;
-    private javax.swing.JPanel pnlDatos1;
     private javax.swing.JTextField tfDetalles;
     private javax.swing.JTextField tfObservaciones;
     private javax.swing.JTextField tfSerie;
     private javax.swing.JTextField tfTicket;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void update(Observable o, Object arg) {
+        boolean flag = (boolean)arg;
+        if (flag == false) {
+            BusyLabel.setVisible(false);
+            BusyLabel.setBusy(false);
+            btnArchivo.setEnabled(true);
+            btnEnviar.setEnabled(true);
+            JOptionPane.showMessageDialog(this, "Registro Creado Exitosamente");
+            limpiarCampos();
+        }
+    }
+
+    /**
+     * Metodo para validar campos vacios y correctos
+     *
+     * @return TRUE si paso la validacion FALSE si no
+     */
+    private boolean validacion() {
+        BusyLabel.setBusy(true);
+        BusyLabel.setVisible(true);
+        if (!validaciones.ValidacionSwing.comprobarVacios(new JTextField[]{tfSerie, tfTicket, tfDetalles, tfObservaciones}) && DatePicker.getDate() != null) {
+            if (validaciones.ExpresionesRegulares.validarTicket(tfTicket.getText())) {
+                if (fichero != null) {
+                    BusyLabel.setBusy(false);
+                    BusyLabel.setVisible(false);
+                    return true;
+                } else {
+                    javax.swing.JOptionPane.showMessageDialog(this, "Archivo No Seleccionado");
+                    BusyLabel.setVisible(false);
+                    BusyLabel.setBusy(false);
+                    return false;
+                }
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "Ticket incorrecto");
+                BusyLabel.setVisible(false);
+                BusyLabel.setBusy(false);   
+                return false;
+            }
+        } else {
+            javax.swing.JOptionPane.showMessageDialog(this, "Todos los campos son Obligatorios");
+            BusyLabel.setVisible(false);
+            BusyLabel.setBusy(false);
+            return false;
+        }
+    }
+
+    /**
+     * Devuelve la fecha en un formato yyyy/MM/dd
+     *
+     * @return Es un String de la fecha con el nuevo formado
+     */
+    public String devolverFecha() {
+        Date fecha = DatePicker.getDate();
+        DateFormat formato = new SimpleDateFormat("yyyy/MM/dd");
+        return formato.format(fecha);
+    }
+
+    /**
+     * Metodo para vaciar los datos del formulario a un Objeto tipo Ticket
+     * (misc.Ticket)
+     */
+    private void getDatos() {
+        t = new Ticket(Integer.valueOf(tfTicket.getText()), tfSerie.getText(),
+                tfDetalles.getText(), tfObservaciones.getText(),
+                fichero.getAbsolutePath(), new Date(devolverFecha()));
+        pathDestino = "/home/archivo/" + fichero.getName();
+    }
+
+    /**
+     * Metodo para hacer mas Bonito el BUSYLABEL
+     *
+     * @return Componente JXBusyLabel
+     *
+     * Se Ocupa en la inicializacion: JXBusyLabel bl = createComplexBusyLaber()
+     */
+    public JXBusyLabel createComplexBusyLabel() {
+        // this will not work in the 0.9.1 release of 
+        // SwingX (need later builds)
+
+        JXBusyLabel label = new JXBusyLabel(new Dimension(38, 38));
+        BusyPainter painter = new BusyPainter(
+                new Rectangle2D.Float(0, 0, 8.0f, 8.0f),
+                new Rectangle2D.Float(5.5f, 5.5f, 27.0f, 27.0f));
+        painter.setTrailLength(4);
+        painter.setPoints(8);
+        painter.setFrame(-1);
+
+        painter.setBaseColor(Color.BLACK);
+        painter.setHighlightColor(Color.WHITE);
+
+        label.setPreferredSize(new Dimension(38, 38));
+        label.setIcon(new EmptyIcon(38, 38));
+        label.setBusyPainter(painter);
+
+        label.setToolTipText("complex busy label");
+
+        return label;
+    }
+
+    /**
+     * Metodo para Limpiar los campos del Formulario
+     */
+    private void limpiarCampos() {
+        fichero = null;
+        tfSerie.setText("");
+        DatePicker.setDate(null);
+        tfTicket.setText("");
+        tfDetalles.setText("");
+        tfObservaciones.setText("");
+        lblArchivoSeleccionado.setText("Archivo No Seleccionado");
+    }
+    
+    /**
+     *  Metodo para Obtener NS de la BD y agregarlos al TextAutoCompleter
+     */
+    private void llenarNS(){
+        TextAutoCompleter textAutoCompleter = new TextAutoCompleter(tfSerie);
+        try {
+            cn.connect();
+            rs =cn.consulta("SELECT ns FROM Equipo");
+            while(rs.next()){
+                //cbNS.addItem(resultado.getString("ns"));
+                textAutoCompleter.addItem(rs.getObject("ns"));
+            }
+            cn.disconnect();
+        } catch (SQLException ex) {
+            System.out.println(ex);
+        }
+    }
+
 }

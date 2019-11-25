@@ -94,6 +94,11 @@ public class Opciones extends javax.swing.JFrame {
 
         btnAltaDoc.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/AltaDoc96.png"))); // NOI18N
         btnAltaDoc.setToolTipText("Alta Documento Falla o Bitacora");
+        btnAltaDoc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAltaDocActionPerformed(evt);
+            }
+        });
         pnlBotonesABC.add(btnAltaDoc, new java.awt.GridBagConstraints());
 
         btnAltaToner.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/AltaToner96.png"))); // NOI18N
@@ -150,6 +155,12 @@ public class Opciones extends javax.swing.JFrame {
         this.dispose();
         bt.setVisible(true);
     }//GEN-LAST:event_btnBuscarTicketActionPerformed
+
+    private void btnAltaDocActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAltaDocActionPerformed
+        AltaTicket at = new AltaTicket();
+        this.dispose();
+        at.setVisible(true);
+    }//GEN-LAST:event_btnAltaDocActionPerformed
 
     /**
      * @param args the command line arguments
