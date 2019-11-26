@@ -6,7 +6,6 @@
 package Ventanas;
 
 import db.Conexion;
-import java.awt.Color;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.swing.JTextField;
@@ -31,6 +30,7 @@ public class Login extends javax.swing.JFrame {
         pnlGlass.setVisible(false);
         this.setLocationRelativeTo(null);
         this.pnlDatos.getRootPane().setDefaultButton(btnLogin);
+        swing.LAF.disenoGUI();
     }
     /**
      * Funcion que en principio cifra la contraseña y despues busca el nombre de
@@ -56,7 +56,7 @@ public class Login extends javax.swing.JFrame {
             if (rs.next()) {
                 String passDB = rs.getNString(2);
 //                System.out.println("Comparando Pass");
-                System.out.println("Pass app:" +pass+"  Pass DB: "+passDB);
+//                System.out.println("Pass app:" +pass+"  Pass DB: "+passDB);
                 if (pass.equals(passDB)) {
                     usuario.setUsername(rs.getNString(1));
                     usuario.setPass(rs.getNString(2));

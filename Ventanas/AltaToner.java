@@ -1,22 +1,20 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package Ventanas;
 
-import com.jcraft.jsch.JSchException;
-import com.jcraft.jsch.SftpException;
+import ConexionFTPconThreads.SFTPSubirArchivo;
+import ConexionSQL.ConexionMYSQL;
 import com.mxrck.autocompleter.TextAutoCompleter;
-import db.Conexion;
-import ftp.SFTPBajarArchivo;
-import ftp.SFTPConnector;
-import java.io.IOException;
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Observable;
 import java.util.Observer;
-import javax.swing.JTextField;
+import javax.swing.JComboBox;
+import javax.swing.JFileChooser;
+import javax.swing.JPanel;
+import javax.swing.filechooser.FileNameExtensionFilter;
 import misc.Ticket;
 import misc.Usuario;
 
@@ -24,133 +22,26 @@ import misc.Usuario;
  *
  * @author Ruben Angeles
  */
-public class BuscarTicket extends javax.swing.JFrame implements Observer {
+public class AltaToner extends javax.swing.JFrame implements Observer {
 
     public Usuario usuario = Opciones.usuario;
-    private Ticket t = new Ticket();
-    public Conexion cn = new Conexion();
+    private Ticket t;
+    private final ConexionMYSQL cn = new ConexionMYSQL("192.168.40.15", "ABC", "consultas", "soportemx");
     private Thread th;
-    ResultSet rs;
+    private ResultSet rs;
+    private File fichero;
+    private String pathDestino;
+    private String color;
+    private int opc;
 
     /**
      * Creates new form BuscarTicket
      */
-    public BuscarTicket() {
+    public AltaToner() {
         initComponents();
         this.setLocationRelativeTo(null);
-        busyLabel.setVisible(false);
+        BusyLabel.setVisible(false);
         llenarTicket();
-    }
-
-    private void llenarTicket() {
-        TextAutoCompleter textAutoCompleter = new TextAutoCompleter(tfTicket);
-        try {
-            cn.conectar();
-            rs = cn.consulta("SELECT ticket FROM Docs");
-            while (rs.next()) {
-                //cbNS.addItem(resultado.getString("ns"));
-                switch (rs.getInt("ticket")) {
-                    case 2:
-                        textAutoCompleter.addItem("Cambio de Toner");
-                        break;
-                    case 1:
-                        textAutoCompleter.addItem("Falla sin Ticket");
-                        break;
-                    default:
-                        textAutoCompleter.addItem(rs.getObject("ticket"));
-                        break;
-                }
-            }
-            cn.desconectar();
-        } catch (SQLException ex) {
-            System.out.println(ex);
-        }
-    }
-
-    private void getValores(String serie) {
-        if (!serie.isEmpty()) {
-            try {
-                cn.conectar();
-                rs = cn.consulta("SELECT * FROM Docs WHERE ticket = '" + tfTicket.getText() + "'");
-                while (rs.next()) {
-                    t.setId(rs.getInt("id"));
-                    t.setNs(rs.getString("ns"));
-                    t.setFecha(rs.getDate("fecha"));
-                    t.setTicket(rs.getInt("ticket"));
-                    t.setDetalle(rs.getString("detalle"));
-                    t.setObservaciones(rs.getString("observaciones"));
-                    t.setPath(rs.getString("path"));
-                }
-                rs = cn.consulta("SELECT * FROM Equipo WHERE ns = '" + t.getNs() + "'");
-                while (rs.next()) {
-                    lblSerie_.setText(rs.getString(1));
-                    lblMarca_.setText(rs.getString(2));
-                    lblModelo_.setText(rs.getString(3) + " " + rs.getString(4));
-                    lblUbicacion_.setText(rs.getString(7) + " " + rs.getString(8));
-                    lblIP_.setText(rs.getString(5));
-                    lblMac_.setText(rs.getString(6));
-                    lblTipo_.setText(rs.getString(9));
-                    lblToner_.setText(rs.getString(10));
-                }
-                rs = cn.consulta("SELECT * FROM Toner WHERE modelo = '" + lblToner_.getText() + "'");
-                while (rs.next()) {
-                    lblTonerCian_.setText(String.valueOf(rs.getInt(2)));
-                    lblTonerMagenta_.setText(String.valueOf(rs.getInt(3)));
-                    lblTonerYellow_.setText(String.valueOf(rs.getInt(4)));
-                    lblTonerBlack_.setText(String.valueOf(rs.getInt(5)));
-                }
-                cn.desconectar();
-                if (lblTipo_.getText().equals("Blanco y negro")) {
-                    lbltTonerCian.setVisible(false);
-                    lblTonerCian_.setVisible(false);
-                    lbltTonerMagenta.setVisible(false);
-                    lblTonerMagenta_.setVisible(false);
-                    lbltTonerYellow.setVisible(false);
-                    lblTonerYellow_.setVisible(false);
-                } else{
-                    lbltTonerCian.setVisible(true);
-                    lblTonerCian_.setVisible(true);
-                    lbltTonerMagenta.setVisible(true);
-                    lblTonerMagenta_.setVisible(true);
-                    lbltTonerYellow.setVisible(true);
-                    lblTonerYellow_.setVisible(true);
-                }
-                lblTicket_.setText(String.valueOf(t.getTicket()));
-                lblDetalles_.setText(t.getDetalle());
-                lblObservaciones_.setText(t.getObservaciones());
-                lblFecha_.setText(String.valueOf(t.getFecha()));
-            } catch (SQLException e) {
-                System.out.println(e.getMessage());
-            }
-        }
-    }
-
-    private void bajarArchivoSFTP() {
-        String user = "archivo";
-        String pass = "soportemx";
-        String host = "192.168.40.15";
-        int port = 22;
-        try {
-            SFTPConnector connector = new SFTPConnector();
-            System.out.println("conectando.....");
-            connector.connect(user, pass, host, port); //conecta al servidor
-            System.out.println("Conectado");
-            connector.getFile(t.getPath());
-            connector.disconnect();
-
-        } catch (JSchException | IllegalAccessException | SftpException | IOException ex) {
-            System.out.println(ex.getMessage());
-        }
-    }
-
-    private void abrirArchivo() {
-        try {
-            ProcessBuilder pb = new ProcessBuilder();
-            pb.command("cmd.exe", "/c", "C:\\Users\\Ruben Angeles\\Desktop\\Scan\\temp.pdf");
-            pb.start();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
-        }
     }
 
     /**
@@ -166,7 +57,7 @@ public class BuscarTicket extends javax.swing.JFrame implements Observer {
         lblTitulo = new javax.swing.JLabel();
         pnlBusqueda = new javax.swing.JPanel();
         lblNS = new javax.swing.JLabel();
-        tfTicket = new javax.swing.JTextField();
+        tfNS = new javax.swing.JTextField();
         btnBuscar = new javax.swing.JButton();
         pnlDatos = new javax.swing.JPanel();
         lblSerie = new javax.swing.JLabel();
@@ -193,17 +84,20 @@ public class BuscarTicket extends javax.swing.JFrame implements Observer {
         lblTonerYellow_ = new javax.swing.JLabel();
         lblTonerBlack = new javax.swing.JLabel();
         lblTonerBlack_ = new javax.swing.JLabel();
-        pnlDetalles = new javax.swing.JPanel();
-        lblTicket = new javax.swing.JLabel();
-        lblTicket_ = new javax.swing.JLabel();
-        lblDetalles = new javax.swing.JLabel();
-        lblDetalles_ = new javax.swing.JLabel();
-        lblObservaciones = new javax.swing.JLabel();
-        lblObservaciones_ = new javax.swing.JLabel();
+        BusyLabel = new org.jdesktop.swingx.JXBusyLabel();
+        pnlBotones = new javax.swing.JPanel();
+        btnLimpiar = new javax.swing.JButton();
+        btnEnviar = new javax.swing.JButton();
+        pnlDatosTicket = new javax.swing.JPanel();
         lblFecha = new javax.swing.JLabel();
-        lblFecha_ = new javax.swing.JLabel();
-        btnVerArchivo = new javax.swing.JButton();
-        busyLabel = new org.jdesktop.swingx.JXBusyLabel();
+        lblTicket = new javax.swing.JLabel();
+        lblArchivo = new javax.swing.JLabel();
+        DatePicker = new org.jdesktop.swingx.JXDatePicker();
+        tfTicket = new javax.swing.JTextField();
+        btnArchivo = new javax.swing.JButton();
+        lblArchivoSeleccionado = new javax.swing.JLabel();
+        lblColor = new javax.swing.JLabel();
+        cbColor = new javax.swing.JComboBox<>();
         lblFondo = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -223,16 +117,16 @@ public class BuscarTicket extends javax.swing.JFrame implements Observer {
 
         lblTitulo.setFont(new java.awt.Font("Arial", 1, 36)); // NOI18N
         lblTitulo.setForeground(new java.awt.Color(255, 255, 255));
-        lblTitulo.setText("Consultar Ticket");
-        getContentPane().add(lblTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 20, -1, -1));
+        lblTitulo.setText("Alta Toner");
+        getContentPane().add(lblTitulo, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 10, -1, -1));
 
         pnlBusqueda.setOpaque(false);
 
         lblNS.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         lblNS.setForeground(new java.awt.Color(255, 255, 255));
-        lblNS.setText("Numero de Ticket:");
+        lblNS.setText("Numero de Serie:");
 
-        tfTicket.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        tfNS.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
 
         btnBuscar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/lupa64.png"))); // NOI18N
         btnBuscar.setOpaque(false);
@@ -250,7 +144,7 @@ public class BuscarTicket extends javax.swing.JFrame implements Observer {
                 .addGap(30, 30, 30)
                 .addComponent(lblNS)
                 .addGap(10, 10, 10)
-                .addComponent(tfTicket, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(tfNS, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(btnBuscar)
                 .addContainerGap())
@@ -261,7 +155,7 @@ public class BuscarTicket extends javax.swing.JFrame implements Observer {
                 .addContainerGap()
                 .addGroup(pnlBusquedaLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.CENTER)
                     .addComponent(btnBuscar)
-                    .addComponent(tfTicket, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(tfNS, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lblNS))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -477,104 +371,132 @@ public class BuscarTicket extends javax.swing.JFrame implements Observer {
 
         getContentPane().add(pnlInventario, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 20, 200, 140));
 
-        pnlDetalles.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Detalles del Ticket", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 14), new java.awt.Color(255, 255, 255))); // NOI18N
-        pnlDetalles.setOpaque(false);
+        BusyLabel.setForeground(new java.awt.Color(255, 255, 255));
+        BusyLabel.setText("Cargando...");
+        BusyLabel.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        getContentPane().add(BusyLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 110, -1, -1));
 
-        lblTicket.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lblTicket.setForeground(new java.awt.Color(255, 255, 255));
-        lblTicket.setText("Ticket:");
+        pnlBotones.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Opciones", javax.swing.border.TitledBorder.CENTER, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Arial", 0, 14), new java.awt.Color(255, 255, 255))); // NOI18N
+        pnlBotones.setForeground(new java.awt.Color(255, 255, 255));
+        pnlBotones.setOpaque(false);
 
-        lblTicket_.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lblTicket_.setForeground(new java.awt.Color(255, 255, 255));
-        lblTicket_.setText("N/A");
+        btnLimpiar.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        btnLimpiar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/cancel32.png"))); // NOI18N
+        btnLimpiar.setText("Limpiar");
+        btnLimpiar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnLimpiar.setOpaque(false);
+        btnLimpiar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnLimpiar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnLimpiarActionPerformed(evt);
+            }
+        });
+        pnlBotones.add(btnLimpiar);
 
-        lblDetalles.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lblDetalles.setForeground(new java.awt.Color(255, 255, 255));
-        lblDetalles.setText("Detalles:");
+        btnEnviar.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        btnEnviar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/check32.png"))); // NOI18N
+        btnEnviar.setText("Enviar");
+        btnEnviar.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        btnEnviar.setOpaque(false);
+        btnEnviar.setVerticalTextPosition(javax.swing.SwingConstants.BOTTOM);
+        btnEnviar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnEnviarActionPerformed(evt);
+            }
+        });
+        pnlBotones.add(btnEnviar);
 
-        lblDetalles_.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lblDetalles_.setForeground(new java.awt.Color(255, 255, 255));
-        lblDetalles_.setText("N/A");
+        getContentPane().add(pnlBotones, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 380, 200, 100));
 
-        lblObservaciones.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lblObservaciones.setForeground(new java.awt.Color(255, 255, 255));
-        lblObservaciones.setText("Observaciones:");
-
-        lblObservaciones_.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lblObservaciones_.setForeground(new java.awt.Color(255, 255, 255));
-        lblObservaciones_.setText("N/A");
+        pnlDatosTicket.setBackground(new java.awt.Color(0, 0, 0));
+        pnlDatosTicket.setOpaque(false);
 
         lblFecha.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
         lblFecha.setForeground(new java.awt.Color(255, 255, 255));
         lblFecha.setText("Fecha:");
 
-        lblFecha_.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        lblFecha_.setForeground(new java.awt.Color(255, 255, 255));
-        lblFecha_.setText("N/A");
+        lblTicket.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblTicket.setForeground(new java.awt.Color(255, 255, 255));
+        lblTicket.setText("Número de Ticket:");
 
-        btnVerArchivo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        btnVerArchivo.setText("Ver Archivo");
-        btnVerArchivo.setOpaque(false);
-        btnVerArchivo.addActionListener(new java.awt.event.ActionListener() {
+        lblArchivo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblArchivo.setForeground(new java.awt.Color(255, 255, 255));
+        lblArchivo.setText("Archivo:");
+
+        DatePicker.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+
+        tfTicket.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        tfTicket.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+
+        btnArchivo.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        btnArchivo.setText("Seleccionar Archivo");
+        btnArchivo.setBorder(javax.swing.BorderFactory.createEmptyBorder(1, 1, 1, 1));
+        btnArchivo.setOpaque(false);
+        btnArchivo.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnVerArchivoActionPerformed(evt);
+                btnArchivoActionPerformed(evt);
             }
         });
 
-        javax.swing.GroupLayout pnlDetallesLayout = new javax.swing.GroupLayout(pnlDetalles);
-        pnlDetalles.setLayout(pnlDetallesLayout);
-        pnlDetallesLayout.setHorizontalGroup(
-            pnlDetallesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlDetallesLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlDetallesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblTicket, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblDetalles, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(lblObservaciones, javax.swing.GroupLayout.Alignment.TRAILING))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(pnlDetallesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(pnlDetallesLayout.createSequentialGroup()
-                        .addComponent(lblTicket_)
-                        .addGap(323, 323, 323)
-                        .addComponent(lblFecha)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblFecha_))
-                    .addComponent(lblDetalles_)
-                    .addComponent(lblObservaciones_))
-                .addContainerGap(286, Short.MAX_VALUE))
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, pnlDetallesLayout.createSequentialGroup()
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(btnVerArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 120, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addGap(337, 337, 337))
-        );
-        pnlDetallesLayout.setVerticalGroup(
-            pnlDetallesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(pnlDetallesLayout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(pnlDetallesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblTicket)
-                    .addComponent(lblTicket_)
+        lblArchivoSeleccionado.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblArchivoSeleccionado.setForeground(new java.awt.Color(255, 255, 255));
+        lblArchivoSeleccionado.setText("Archivo No Seleccionado");
+
+        lblColor.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        lblColor.setForeground(new java.awt.Color(255, 255, 255));
+        lblColor.setText("Color:");
+
+        cbColor.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
+        cbColor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Selecciona un Color", "Cian", "Magenta", "Yellow", "Black" }));
+
+        javax.swing.GroupLayout pnlDatosTicketLayout = new javax.swing.GroupLayout(pnlDatosTicket);
+        pnlDatosTicket.setLayout(pnlDatosTicketLayout);
+        pnlDatosTicketLayout.setHorizontalGroup(
+            pnlDatosTicketLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDatosTicketLayout.createSequentialGroup()
+                .addGap(48, 48, 48)
+                .addGroup(pnlDatosTicketLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lblColor)
                     .addComponent(lblFecha)
-                    .addComponent(lblFecha_))
+                    .addComponent(lblTicket)
+                    .addComponent(lblArchivo))
                 .addGap(18, 18, 18)
-                .addGroup(pnlDetallesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lblDetalles_)
-                    .addComponent(lblDetalles))
-                .addGap(18, 18, 18)
-                .addGroup(pnlDetallesLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lblObservaciones)
-                    .addComponent(lblObservaciones_))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 41, Short.MAX_VALUE)
-                .addComponent(btnVerArchivo)
-                .addContainerGap())
+                .addGroup(pnlDatosTicketLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(pnlDatosTicketLayout.createSequentialGroup()
+                        .addGap(10, 10, 10)
+                        .addComponent(lblArchivoSeleccionado))
+                    .addGroup(pnlDatosTicketLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                        .addComponent(DatePicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(tfTicket, javax.swing.GroupLayout.DEFAULT_SIZE, 179, Short.MAX_VALUE)
+                        .addComponent(btnArchivo, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(cbColor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(0, 80, Short.MAX_VALUE))
+        );
+        pnlDatosTicketLayout.setVerticalGroup(
+            pnlDatosTicketLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(pnlDatosTicketLayout.createSequentialGroup()
+                .addContainerGap()
+                .addGroup(pnlDatosTicketLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lblColor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(cbColor, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(14, 14, 14)
+                .addGroup(pnlDatosTicketLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                    .addComponent(DatePicker, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lblFecha, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addGroup(pnlDatosTicketLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(tfTicket, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblTicket, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, Short.MAX_VALUE)
+                .addGroup(pnlDatosTicketLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(btnArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lblArchivo, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lblArchivoSeleccionado, javax.swing.GroupLayout.PREFERRED_SIZE, 23, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGap(40, 40, 40))
         );
 
-        getContentPane().add(pnlDetalles, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 340, 830, 200));
-
-        busyLabel.setForeground(new java.awt.Color(255, 255, 255));
-        busyLabel.setText("Cargando...");
-        busyLabel.setFont(new java.awt.Font("Arial", 0, 14)); // NOI18N
-        getContentPane().add(busyLabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 110, -1, -1));
+        getContentPane().add(pnlDatosTicket, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 340, 440, 190));
 
         lblFondo.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/FondoBuscarNS.png"))); // NOI18N
         getContentPane().add(lblFondo, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 850, -1));
@@ -590,24 +512,58 @@ public class BuscarTicket extends javax.swing.JFrame implements Observer {
     }//GEN-LAST:event_btnLogOutActionPerformed
 
     private void btnBuscarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBuscarActionPerformed
-
-        getValores(tfTicket.getText());
-
+        getValores(tfNS.getText());
     }//GEN-LAST:event_btnBuscarActionPerformed
 
-    private void btnVerArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVerArchivoActionPerformed
-        if (!es.discoduroderoer.swing.Validacion.comprobarVacios(new JTextField[]{tfTicket})) {
-            busyLabel.setVisible(true);
-            busyLabel.setBusy(true);
-            btnVerArchivo.setEnabled(false);
-            SFTPBajarArchivo bajarArchivo = new SFTPBajarArchivo(t.getPath());
-            bajarArchivo.addObserver(this);
-            th = new Thread(bajarArchivo);
+    private void btnLimpiarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnLimpiarActionPerformed
+        limpiarCampos();
+    }//GEN-LAST:event_btnLimpiarActionPerformed
+
+    private void btnEnviarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnEnviarActionPerformed
+        if (validacion()) {
+            btnArchivo.setEnabled(false);
+            btnEnviar.setEnabled(false);
+            BusyLabel.setBusy(true);
+            BusyLabel.setText("Obteniendo Datos");
+            BusyLabel.setVisible(true);
+            getDatos();
+            BusyLabel.setText("Subiendo Archivo");
+            SFTPSubirArchivo up = new SFTPSubirArchivo(fichero);
+            up.addObserver(this);
+            th = new Thread(up);
             th.start();
-        }else{
-            javax.swing.JOptionPane.showMessageDialog(rootPane, "Campo de Ticket Vacio");
+            cn.connect();
+            try{
+                cn.executeQuery("INSERT INTO Docs(ns,fecha,ticket,detalle,observaciones,path) VALUES ('"+t.getNs()+"','"+devolverFecha()+"','"+t.getTicket()+"','"+t.getDetalle()+"','"+t.getObservaciones()+"','"+pathDestino+"')");
+                cn.executeQuery("UPDATE Toner SET "+color.toLowerCase()+" = '"+opc+"' WHERE modelo = '"+lblToner_.getText()+"'");
+                cn.disconnect();
+            }catch(SQLException e){
+                System.out.println(e.getMessage());
+            }
+        } else {
         }
-    }//GEN-LAST:event_btnVerArchivoActionPerformed
+    }//GEN-LAST:event_btnEnviarActionPerformed
+
+    private void btnArchivoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnArchivoActionPerformed
+        //Creamos el objeto JFileChooser
+        JFileChooser fc = new JFileChooser();
+        fc.setFileFilter(new FileNameExtensionFilter("PDF", "pdf"));
+        fc.setDialogTitle("SELECCIONAR UN ARCHIVO");
+        JPanel contentPane = new JPanel();
+        contentPane.setLayout(null);
+        //Abrimos la ventana, guardamos la opcion seleccionada por el usuario
+        int seleccion = fc.showOpenDialog(contentPane);
+        //Si el usuario, pincha en aceptar
+        if (seleccion == JFileChooser.APPROVE_OPTION) {
+            //Seleccionamos el fichero
+            fichero = fc.getSelectedFile();
+            //Ecribe la ruta del fichero seleccionado en el campo de texto
+            lblArchivoSeleccionado.setText(fichero.getName());
+            //Escribe El path de origen
+            System.out.println("Archivo selecionado: " + fichero.getAbsolutePath());
+        }
+        //validacion();
+    }//GEN-LAST:event_btnArchivoActionPerformed
 
     /**
      * @param args the command line arguments
@@ -626,27 +582,32 @@ public class BuscarTicket extends javax.swing.JFrame implements Observer {
                 }
             }
         } catch (ClassNotFoundException | InstantiationException | IllegalAccessException | javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(BuscarTicket.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(AltaToner.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
+        //</editor-fold>
         //</editor-fold>
 
         //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(() -> {
-            new BuscarTicket().setVisible(true);
+            new AltaToner().setVisible(true);
         });
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private org.jdesktop.swingx.JXBusyLabel BusyLabel;
+    private org.jdesktop.swingx.JXDatePicker DatePicker;
+    private javax.swing.JButton btnArchivo;
     private javax.swing.JButton btnBuscar;
+    private javax.swing.JButton btnEnviar;
+    private javax.swing.JButton btnLimpiar;
     private javax.swing.JButton btnLogOut;
-    private javax.swing.JButton btnVerArchivo;
-    private org.jdesktop.swingx.JXBusyLabel busyLabel;
-    private javax.swing.JLabel lblDetalles;
-    private javax.swing.JLabel lblDetalles_;
+    private javax.swing.JComboBox<String> cbColor;
+    private javax.swing.JLabel lblArchivo;
+    private javax.swing.JLabel lblArchivoSeleccionado;
+    private javax.swing.JLabel lblColor;
     private javax.swing.JLabel lblFecha;
-    private javax.swing.JLabel lblFecha_;
     private javax.swing.JLabel lblFondo;
     private javax.swing.JLabel lblIP;
     private javax.swing.JLabel lblIP_;
@@ -657,12 +618,9 @@ public class BuscarTicket extends javax.swing.JFrame implements Observer {
     private javax.swing.JLabel lblModelo;
     private javax.swing.JLabel lblModelo_;
     private javax.swing.JLabel lblNS;
-    private javax.swing.JLabel lblObservaciones;
-    private javax.swing.JLabel lblObservaciones_;
     private javax.swing.JLabel lblSerie;
     private javax.swing.JLabel lblSerie_;
     private javax.swing.JLabel lblTicket;
-    private javax.swing.JLabel lblTicket_;
     private javax.swing.JLabel lblTipo;
     private javax.swing.JLabel lblTipo_;
     private javax.swing.JLabel lblTitulo;
@@ -677,10 +635,12 @@ public class BuscarTicket extends javax.swing.JFrame implements Observer {
     private javax.swing.JLabel lbltTonerCian;
     private javax.swing.JLabel lbltTonerMagenta;
     private javax.swing.JLabel lbltTonerYellow;
+    private javax.swing.JPanel pnlBotones;
     private javax.swing.JPanel pnlBusqueda;
     private javax.swing.JPanel pnlDatos;
-    private javax.swing.JPanel pnlDetalles;
+    private javax.swing.JPanel pnlDatosTicket;
     private javax.swing.JPanel pnlInventario;
+    private javax.swing.JTextField tfNS;
     private javax.swing.JTextField tfTicket;
     // End of variables declaration//GEN-END:variables
 
@@ -688,9 +648,180 @@ public class BuscarTicket extends javax.swing.JFrame implements Observer {
     public void update(Observable o, Object arg) {
         boolean flag = (boolean) arg;
         if (flag == false) {
-            btnVerArchivo.setEnabled(true);
-            busyLabel.setVisible(false);
-            busyLabel.setBusy(false);
+            BusyLabel.setVisible(false);
+            BusyLabel.setBusy(false);
+            btnEnviar.setEnabled(true);
+            btnArchivo.setEnabled(false);
+            javax.swing.JOptionPane.showMessageDialog(this, "Registro Creado Exitosamente");
+            limpiarCampos();
+        }
+    }
+    
+    private void llenarTicket() {
+        TextAutoCompleter textAutoCompleter = new TextAutoCompleter(tfNS);
+        try {
+            cn.connect();
+            rs = cn.consulta("SELECT ns FROM Equipo");
+            while (rs.next()) {
+                textAutoCompleter.addItem(rs.getObject("ns"));
+            }
+            cn.disconnect();
+        } catch (SQLException ex) {
+            System.out.println(ex);
+        }
+    }
+
+    private void getValores(String serie) {
+        if (!serie.isEmpty()) {
+            try {
+                cn.connect();
+                rs = cn.consulta("SELECT * FROM Equipo WHERE ns = '"+tfNS.getText()+"'");
+                while(rs.next()){
+                    lblSerie_.setText(rs.getString(1));
+                    lblMarca_.setText(rs.getString(2));
+                    lblModelo_.setText(rs.getString(3)+" "+rs.getString(4));
+                    lblUbicacion_.setText(rs.getString(7)+" "+rs.getString(8));
+                    lblIP_.setText(rs.getString(5));
+                    lblMac_.setText(rs.getString(6));
+                    lblTipo_.setText(rs.getString(9));
+                    lblToner_.setText(rs.getString(10));
+                }
+                rs = cn.consulta("SELECT * FROM Toner WHERE modelo = '" + lblToner_.getText() + "'");
+                if (lblTipo_.getText().equals("Blanco y negro")) {
+                    lbltTonerCian.setVisible(false);
+                    lblTonerCian_.setVisible(false);
+                    lbltTonerMagenta.setVisible(false);
+                    lblTonerMagenta_.setVisible(false);
+                    lbltTonerYellow.setVisible(false);
+                    lblTonerYellow_.setVisible(false);
+                    llenarCB(false, cbColor);
+                    if(rs.next()){
+                        lblTonerBlack_.setText(String.valueOf(rs.getInt(5)));
+                    }
+                } else {
+                    llenarCB(true, cbColor);
+                    while (rs.next()) {
+                        lbltTonerCian.setVisible(true);
+                        lblTonerCian_.setVisible(true);
+                        lbltTonerMagenta.setVisible(true);
+                        lblTonerMagenta_.setVisible(true);
+                        lbltTonerYellow.setVisible(true);
+                        lblTonerYellow_.setVisible(true);
+                        lblTonerCian_.setText(String.valueOf(rs.getInt(2)));
+                        lblTonerMagenta_.setText(String.valueOf(rs.getInt(3)));
+                        lblTonerYellow_.setText(String.valueOf(rs.getInt(4)));
+                        lblTonerBlack_.setText(String.valueOf(rs.getInt(5)));
+                    }
+                }
+                                
+                cn.disconnect();
+            } catch (SQLException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private void limpiarCampos() {
+        fichero = null;
+        llenarCB(true, cbColor);
+        cbColor.setSelectedIndex(0);
+        tfNS.setText("");
+        DatePicker.setDate(null);
+        tfTicket.setText("");
+        lblArchivoSeleccionado.setText("Archivo No Seleccionado");
+        lblSerie_.setText("N/A");
+        lblMarca_.setText("N/A");
+        lblModelo_.setText("N/A");
+        lblUbicacion_.setText("N/A");
+        lblIP_.setText("N/A");
+        lblMac_.setText("N/A");
+        lblTipo_.setText("N/A");
+        lblToner_.setText("N/A");
+        lblTonerCian_.setText("N/A");
+        lblTonerMagenta_.setText("N/A");
+        lblTonerYellow_.setText("N/A");
+        lblTonerBlack_.setText("N/A");
+        
+    }
+
+    private boolean validacion() {
+         if (cbColor.getSelectedIndex() != 0) {
+            if(DatePicker.getDate() != null){
+                if (!tfTicket.getText().isBlank()) {
+                    if(validaciones.ExpresionesRegulares.validarTicket(tfTicket.getText())){ 
+                        if(this.fichero != null){
+                            return true;
+                        } else{
+                            javax.swing.JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN ARCHIVO PDF", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
+                            return false; 
+                        }
+                    } else {
+                        javax.swing.JOptionPane.showMessageDialog(this, "EL TICKET NO ES VALIDO", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
+                        return false;
+                    }
+                } else {
+                    javax.swing.JOptionPane.showMessageDialog(this, "EL TICKET ES OBLIGATORIO", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    return false;                
+                }
+            } else{
+                javax.swing.JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR FECHA VALIDA", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
+                return false;
+            }   
+        } else {
+             javax.swing.JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN COLOR", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
+             return false;
+        }
+    }
+
+    private void getDatos() {
+        switch (cbColor.getSelectedIndex()){
+            case 1:
+                color = "C";
+                opc = Integer.parseInt(lblTonerCian_.getText())+1;
+                break;
+            case 2:
+                color = "M";
+                opc = Integer.parseInt(lblTonerMagenta_.getText())+1;
+                break;
+            case 3:
+                color = "Y";
+                opc = Integer.parseInt(lblTonerYellow_.getText())+1;
+                break;
+            case 4:
+                color = "K";
+                opc = Integer.parseInt(lblTonerBlack_.getText())+1;
+                break;
+        }
+        String detalles = "Se Recibe Toner "+lblToner_.getText()+color;
+         t = new Ticket(Integer.valueOf(tfTicket.getText()), tfNS.getText(),
+                detalles, detalles,fichero.getAbsolutePath(), new Date(devolverFecha()));
+        pathDestino = "/home/archivo/" + fichero.getName();
+    }
+
+    private String devolverFecha() {
+        Date fecha = DatePicker.getDate();
+        DateFormat formato = new SimpleDateFormat("yyyy/MM/dd");
+        return formato.format(fecha);
+    }
+    
+    /**
+     * Metodo para llenar un jComboBox de dos maneras distintas
+     * @param flag  Para alternar entre opciones
+     *              True = Color;
+     *              False = ByN;
+     * @param cb es el jComboBox sobre el cual vamos a actuar
+     */
+    private void llenarCB(boolean flag,JComboBox cb){
+        if (flag) {
+            cb.removeAllItems();
+            cb.addItem("Selecciona un Color");
+            cb.addItem("Cian");
+            cb.addItem("Magenta");
+            cb.addItem("Yellow");
+            cb.addItem("Black");
+        } else {
+            cb.removeAllItems();
+            cb.addItem("Black");
         }
     }
 }

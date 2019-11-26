@@ -88,6 +88,21 @@ public class BuscarEquipo extends javax.swing.JFrame implements Observer{
                 }
                 llenarTabla();
                 cn.desconectar();
+                if (lblTipo_.getText().equals("Blanco y negro")) {
+                    lbltTonerCian.setVisible(false);
+                    lblTonerCian_.setVisible(false);
+                    lbltTonerMagenta.setVisible(false);
+                    lblTonerMagenta_.setVisible(false);
+                    lbltTonerYellow.setVisible(false);
+                    lblTonerYellow_.setVisible(false);
+                } else{
+                    lbltTonerCian.setVisible(true);
+                    lblTonerCian_.setVisible(true);
+                    lbltTonerMagenta.setVisible(true);
+                    lblTonerMagenta_.setVisible(true);
+                    lbltTonerYellow.setVisible(true);
+                    lblTonerYellow_.setVisible(true);
+                }
             }catch(SQLException e){
                 System.out.println(e.getMessage());
             }

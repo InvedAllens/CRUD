@@ -103,6 +103,11 @@ public class Opciones extends javax.swing.JFrame {
 
         btnAltaToner.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/AltaToner96.png"))); // NOI18N
         btnAltaToner.setToolTipText("Alta Toner en el inventario");
+        btnAltaToner.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnAltaTonerActionPerformed(evt);
+            }
+        });
         pnlBotonesABC.add(btnAltaToner, new java.awt.GridBagConstraints());
 
         btnBajaToner.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/BajaToner96.png"))); // NOI18N
@@ -161,6 +166,12 @@ public class Opciones extends javax.swing.JFrame {
         this.dispose();
         at.setVisible(true);
     }//GEN-LAST:event_btnAltaDocActionPerformed
+
+    private void btnAltaTonerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnAltaTonerActionPerformed
+        AltaToner at = new AltaToner();
+        this.dispose();
+        at.setVisible(true);
+    }//GEN-LAST:event_btnAltaTonerActionPerformed
 
     /**
      * @param args the command line arguments
