@@ -43,6 +43,7 @@ public class AltaToner extends javax.swing.JFrame implements Observer {
         this.setLocationRelativeTo(null);
         BusyLabel.setVisible(false);
         llenarTicket();
+        swing.MiSwing.iconoJFrame(this, "/images/iconoCalavera.png");
     }
 
     /**
@@ -652,7 +653,7 @@ public class AltaToner extends javax.swing.JFrame implements Observer {
             BusyLabel.setVisible(false);
             BusyLabel.setBusy(false);
             btnEnviar.setEnabled(true);
-            btnArchivo.setEnabled(false);
+            btnArchivo.setEnabled(true);
             javax.swing.JOptionPane.showMessageDialog(this, "Registro Creado Exitosamente");
             limpiarCampos();
         }
@@ -747,7 +748,7 @@ public class AltaToner extends javax.swing.JFrame implements Observer {
 
     private boolean validacion() {
         if(!tfNS.getText().isBlank()){
-            if (cbColor.getSelectedIndex() != 0) {
+            if (cbColor.getSelectedIndex() != 0 | cbColor.getSelectedItem().equals("Black")) {
                 if(DatePicker.getDate() != null){
                     if (!tfTicket.getText().isBlank()) {
                         if(validaciones.ExpresionesRegulares.validarTicket(tfTicket.getText())){ 
@@ -780,20 +781,20 @@ public class AltaToner extends javax.swing.JFrame implements Observer {
     }
 
     private void getDatos() {
-        switch (cbColor.getSelectedIndex()){
-            case 1:
+        switch ((String)cbColor.getSelectedItem()){
+            case "Cian":
                 color = "C";
                 opc = Integer.parseInt(lblTonerCian_.getText())+1;
                 break;
-            case 2:
+            case "Magenta":
                 color = "M";
                 opc = Integer.parseInt(lblTonerMagenta_.getText())+1;
                 break;
-            case 3:
+            case "Yellow":
                 color = "Y";
                 opc = Integer.parseInt(lblTonerYellow_.getText())+1;
                 break;
-            case 4:
+            case "Black":
                 color = "K";
                 opc = Integer.parseInt(lblTonerBlack_.getText())+1;
                 break;

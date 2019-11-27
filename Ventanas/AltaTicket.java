@@ -47,6 +47,7 @@ public class AltaTicket extends javax.swing.JFrame implements Observer {
         this.setLocationRelativeTo(null);
         llenarNS();
         BusyLabel.setVisible(false);
+        swing.MiSwing.iconoJFrame(this, "/images/iconoCalavera.png");
     }
 
     /**

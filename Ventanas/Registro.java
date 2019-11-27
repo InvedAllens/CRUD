@@ -23,6 +23,7 @@ public class Registro extends javax.swing.JFrame {
         GrupoBotonesSexo.add(rbtnMujer);
         GrupoBotonesSexo.add(rbtnOtro);
         this.setLocationRelativeTo(null);
+        swing.MiSwing.iconoJFrame(this, "/images/iconoCalavera.png");
     }
     
     private void limpiarCampos(){

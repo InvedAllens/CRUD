@@ -45,6 +45,7 @@ public class BuscarEquipo extends javax.swing.JFrame implements Observer{
         this.setLocationRelativeTo(null);
         llenarNS();
         busyLabel.setVisible(false);
+        swing.MiSwing.iconoJFrame(this, "/images/iconoCalavera.png");
     }
     /**
      *  Metodo para Obtener NS de la BD y agregarlos al TextAutoCompleter

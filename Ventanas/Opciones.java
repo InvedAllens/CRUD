@@ -29,6 +29,7 @@ public class Opciones extends javax.swing.JFrame {
         if (!"Admin".equals(usuario.getTipo())) {
             pnlBotonesABC.setVisible(false);
             btnUser.setVisible(false);
+            swing.MiSwing.iconoJFrame(this, "/images/iconoCalavera.png");
         }
     }
     /**
@@ -112,6 +113,11 @@ public class Opciones extends javax.swing.JFrame {
 
         btnBajaToner.setIcon(new javax.swing.ImageIcon(getClass().getResource("/images/BajaToner96.png"))); // NOI18N
         btnBajaToner.setToolTipText("Cambio y Baja de Toner del inventario");
+        btnBajaToner.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnBajaTonerActionPerformed(evt);
+            }
+        });
         pnlBotonesABC.add(btnBajaToner, new java.awt.GridBagConstraints());
 
         getContentPane().add(pnlBotonesABC, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 60, 440, 110));
@@ -172,6 +178,12 @@ public class Opciones extends javax.swing.JFrame {
         this.dispose();
         at.setVisible(true);
     }//GEN-LAST:event_btnAltaTonerActionPerformed
+
+    private void btnBajaTonerActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnBajaTonerActionPerformed
+        BajaToner bt = new BajaToner();
+        this.dispose();
+        bt.setVisible(true);
+    }//GEN-LAST:event_btnBajaTonerActionPerformed
 
     /**
      * @param args the command line arguments

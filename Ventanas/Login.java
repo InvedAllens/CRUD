@@ -31,6 +31,7 @@ public class Login extends javax.swing.JFrame {
         this.setLocationRelativeTo(null);
         this.pnlDatos.getRootPane().setDefaultButton(btnLogin);
         swing.LAF.disenoGUI();
+        swing.MiSwing.iconoJFrame(this, "/images/iconoCalavera.png");
     }
     /**
      * Funcion que en principio cifra la contraseña y despues busca el nombre de
