@@ -27,6 +27,7 @@ public class AltaToner extends javax.swing.JFrame implements Observer {
     public Usuario usuario = Opciones.usuario;
     private Ticket t;
     private final ConexionMYSQL cn = new ConexionMYSQL("192.168.40.15", "ABC", "consultas", "soportemx");
+    private String[] nss;
     private Thread th;
     private ResultSet rs;
     private File fichero;
@@ -745,31 +746,36 @@ public class AltaToner extends javax.swing.JFrame implements Observer {
     }
 
     private boolean validacion() {
-         if (cbColor.getSelectedIndex() != 0) {
-            if(DatePicker.getDate() != null){
-                if (!tfTicket.getText().isBlank()) {
-                    if(validaciones.ExpresionesRegulares.validarTicket(tfTicket.getText())){ 
-                        if(this.fichero != null){
-                            return true;
-                        } else{
-                            javax.swing.JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN ARCHIVO PDF", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
-                            return false; 
+        if(!tfNS.getText().isBlank()){
+            if (cbColor.getSelectedIndex() != 0) {
+                if(DatePicker.getDate() != null){
+                    if (!tfTicket.getText().isBlank()) {
+                        if(validaciones.ExpresionesRegulares.validarTicket(tfTicket.getText())){ 
+                            if(this.fichero != null){
+                                return true;
+                            } else{
+                                javax.swing.JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN ARCHIVO PDF", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
+                                return false; 
+                            }
+                        } else {
+                            javax.swing.JOptionPane.showMessageDialog(this, "EL TICKET NO ES VALIDO", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
+                            return false;
                         }
                     } else {
-                        javax.swing.JOptionPane.showMessageDialog(this, "EL TICKET NO ES VALIDO", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
-                        return false;
+                        javax.swing.JOptionPane.showMessageDialog(this, "EL TICKET ES OBLIGATORIO", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
+                        return false;                
                     }
-                } else {
-                    javax.swing.JOptionPane.showMessageDialog(this, "EL TICKET ES OBLIGATORIO", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
-                    return false;                
-                }
-            } else{
-                javax.swing.JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR FECHA VALIDA", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
+                } else{
+                    javax.swing.JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR FECHA VALIDA", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
+                    return false;
+                }   
+            } else {
+                javax.swing.JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN COLOR", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
                 return false;
-            }   
-        } else {
-             javax.swing.JOptionPane.showMessageDialog(this, "DEBES SELECCIONAR UN COLOR", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
-             return false;
+            }
+        } else{
+            javax.swing.JOptionPane.showMessageDialog(this, "NUMERO DE SERIE NO VALIDO", "EROR", javax.swing.JOptionPane.ERROR_MESSAGE);
+            return false;
         }
     }
 
