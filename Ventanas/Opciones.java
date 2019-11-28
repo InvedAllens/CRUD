@@ -26,10 +26,12 @@ public class Opciones extends javax.swing.JFrame {
         usuario = Login.usuario;
         initComponents();
         this.setLocationRelativeTo(null);
-        if (!"Admin".equals(usuario.getTipo())) {
+        swing.MiSwing.iconoJFrame(this, "/images/iconoCalavera.png");
+        if ("Lector".equals(usuario.getTipo())) {
             pnlBotonesABC.setVisible(false);
             btnUser.setVisible(false);
-            swing.MiSwing.iconoJFrame(this, "/images/iconoCalavera.png");
+        }else if("Creador".equals(usuario.getTipo())){
+            btnUser.setVisible(false);
         }
     }
     /**

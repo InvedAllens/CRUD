@@ -297,7 +297,7 @@ public class AltaTicket extends javax.swing.JFrame implements Observer {
             th.start();
             cn.connect();
             try{
-                cn.executeQuery("INSERT INTO Docs(ns,fecha,ticket,detalle,observaciones,path) VALUES ('"+t.getNs()+"','"+devolverFecha()+"','"+t.getTicket()+"','"+t.getDetalle()+"','"+t.getObservaciones()+"','"+pathDestino+"')");
+                cn.executeQuery("INSERT INTO Docs(ns,fecha,ticket,detalle,observaciones,path,username) VALUES ('"+t.getNs()+"','"+devolverFecha()+"','"+t.getTicket()+"','"+t.getDetalle()+"','"+t.getObservaciones()+"','"+pathDestino+"','"+usuario.getUsername()+"')");
                 cn.disconnect();
             }catch(SQLException e){
                 System.out.println(e.getMessage());

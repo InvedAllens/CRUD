@@ -520,7 +520,7 @@ public class BajaToner extends javax.swing.JFrame implements Observer {
             th.start();
             cn.connect();
             try {
-                cn.executeQuery("INSERT INTO Docs(ns,fecha,ticket,detalle,observaciones,path) VALUES ('" + t.getNs() + "','" + devolverFecha() + "','" + t.getTicket() + "','" + t.getDetalle() + "','" + t.getObservaciones() + "','" + pathDestino + "')");
+                cn.executeQuery("INSERT INTO Docs(ns,fecha,ticket,detalle,observaciones,path,username) VALUES ('"+t.getNs()+"','"+devolverFecha()+"','"+t.getTicket()+"','"+t.getDetalle()+"','"+t.getObservaciones()+"','"+pathDestino+"','"+usuario.getUsername()+"')");
                 cn.executeQuery("UPDATE Toner SET "+color.toLowerCase()+" = '"+opc+"' WHERE modelo = '"+lblToner_.getText()+"'");
                 cn.disconnect();
             } catch (SQLException e) {
