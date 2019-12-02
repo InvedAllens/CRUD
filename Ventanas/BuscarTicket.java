@@ -1,10 +1,10 @@
 package Ventanas;
 
+import ConexionFTPconThreads.SFTPBajarArchivo;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import db.Conexion;
-import ftp.SFTPBajarArchivo;
 import ftp.SFTPConnector;
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -118,34 +118,6 @@ public class BuscarTicket extends javax.swing.JFrame implements Observer {
             } catch (SQLException e) {
                 System.out.println(e.getMessage());
             }
-        }
-    }
-
-    private void bajarArchivoSFTP() {
-        String user = "archivo";
-        String pass = "soportemx";
-        String host = "192.168.40.15";
-        int port = 22;
-        try {
-            SFTPConnector connector = new SFTPConnector();
-            System.out.println("conectando.....");
-            connector.connect(user, pass, host, port); //conecta al servidor
-            System.out.println("Conectado");
-            connector.getFile(t.getPath());
-            connector.disconnect();
-
-        } catch (JSchException | IllegalAccessException | SftpException | IOException ex) {
-            System.out.println(ex.getMessage());
-        }
-    }
-
-    private void abrirArchivo() {
-        try {
-            ProcessBuilder pb = new ProcessBuilder();
-            pb.command("cmd.exe", "/c", "C:\\Users\\Ruben Angeles\\Desktop\\Scan\\temp.pdf");
-            pb.start();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
         }
     }
 

@@ -610,7 +610,7 @@
                     <Column editable="false" title="TICKET" type="java.lang.Object"/>
                     <Column editable="false" title="FECHA" type="java.lang.Object"/>
                     <Column editable="false" title="DETALLE" type="java.lang.Object"/>
-                    <Column editable="true" title="OBSERVACIONES" type="java.lang.Object"/>
+                    <Column editable="false" title="USUARIO" type="java.lang.Object"/>
                     <Column editable="false" title="PATH" type="java.lang.Object"/>
                     <Column editable="false" title="VER" type="java.lang.Object"/>
                   </Table>

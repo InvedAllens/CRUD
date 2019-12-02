@@ -5,11 +5,11 @@
  */
 package Ventanas;
 
+import ConexionFTPconThreads.SFTPBajarArchivo;
 import com.jcraft.jsch.JSchException;
 import com.jcraft.jsch.SftpException;
 import com.mxrck.autocompleter.TextAutoCompleter;
 import db.Conexion;
-import ftp.SFTPBajarArchivo;
 import ftp.SFTPConnector;
 import java.io.IOException;
 import java.sql.ResultSet;
@@ -29,7 +29,7 @@ public class BuscarEquipo extends javax.swing.JFrame implements Observer{
     public Usuario usuario = Opciones.usuario;
     public Conexion cn = new Conexion();
     private Thread th;
-    ResultSet rs;
+    ResultSet rs,rs1;
     DefaultTableModel modelo = new DefaultTableModel(){
     @Override
     public boolean isCellEditable(int rowIndex,int columnIndex){return false;}
@@ -45,7 +45,6 @@ public class BuscarEquipo extends javax.swing.JFrame implements Observer{
         this.setLocationRelativeTo(null);
         llenarNS();
         busyLabel.setVisible(false);
-        swing.MiSwing.iconoJFrame(this, "/images/iconoCalavera.png");
     }
     /**
      *  Metodo para Obtener NS de la BD y agregarlos al TextAutoCompleter
@@ -111,10 +110,10 @@ public class BuscarEquipo extends javax.swing.JFrame implements Observer{
     }
     private void llenarTabla(){
         modelo.setRowCount(0);
-        modelo.setColumnIdentifiers(new Object[]{"ID","TICKET","FECHA","DETALLE","OBSERVACIONES","PATH","VER"});
+        modelo.setColumnIdentifiers(new Object[]{"ID","TICKET","FECHA","DETALLE","USUARIO","PATH","VER"});
         tabla.setDefaultRenderer(Object.class, new Render());
         try {
-            rs =cn.consulta("SELECT * FROM Docs WHERE ns ='"+tfNS.getText()+"' ORDER BY fecha DESC");
+            rs = cn.consulta("SELECT * FROM Docs WHERE ns ='"+tfNS.getText()+"' ORDER BY fecha DESC");
             while(rs.next()){
                 String ticketOpc;
                 if (null==rs.getString("ticket")) {
@@ -130,40 +129,12 @@ public class BuscarEquipo extends javax.swing.JFrame implements Observer{
                         ticketOpc = rs.getString("ticket");
                         break;
                 }
-                modelo.addRow(new Object[]{rs.getInt("id"),ticketOpc,rs.getString("fecha"),rs.getString("detalle"),rs.getString("observaciones"),rs.getString("path"),btnAbrir});
+                modelo.addRow(new Object[]{rs.getInt("id"),ticketOpc,rs.getString("fecha"),rs.getString("detalle"),rs.getString("username"),rs.getString("path"),btnAbrir});
             }
             tabla.setModel(modelo);
             //BusyLabel.setVisible(false);
         } catch (SQLException ex) {
             System.out.println(ex);
-        }
-    }
-    
-    private void bajarArchivoSFTP(){
-        String user ="archivo";
-        String pass ="soportemx";
-        String host ="192.168.40.15";
-        int port = 22;
-        try {
-            SFTPConnector connector = new SFTPConnector();
-            System.out.println("conectando.....");
-            connector.connect(user, pass, host, port); //conecta al servidor
-            System.out.println("Conectado");
-            connector.getFile(pathDescarga);
-            connector.disconnect();
-            
-        } catch (JSchException | IllegalAccessException | IOException | SftpException ex) {
-            System.out.println(ex.getMessage());
-        }
-    }
-    
-    private void abrirArchivo(){
-        try {
-            ProcessBuilder pb = new ProcessBuilder();
-            pb.command("cmd.exe","/c","C:\\Users\\Ruben Angeles\\Desktop\\Scan\\temp.pdf");
-            pb.start();
-        } catch (IOException ex) {
-            System.out.println(ex.getMessage());
         }
     }
     
@@ -493,11 +464,11 @@ public class BuscarEquipo extends javax.swing.JFrame implements Observer{
 
             },
             new String [] {
-                "ID", "TICKET", "FECHA", "DETALLE", "OBSERVACIONES", "PATH", "VER"
+                "ID", "TICKET", "FECHA", "DETALLE", "USUARIO", "PATH", "VER"
             }
         ) {
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, true, false, false
+                false, false, false, false, false, false, false
             };
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
