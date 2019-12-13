@@ -1,6 +1,6 @@
 # Sistema de Altas, Bajas y Consultas en Aplicacion de escritorio (JAVA)
 
-Crud version JAVA
+Crud version JAVA y MYSQL
 
 ![](https://img.shields.io/github/stars/rubaanxd/CRUD.svg) ![](https://img.shields.io/github/forks/rubaanxd/CRUD.svg) ![](https://img.shields.io/github/tag/rubaanxd/CRUD.svg) ![](https://img.shields.io/github/release/rubaanxd/CRUD.svg) ![](https://img.shields.io/github/issues/rubaanxd/CRUD.svg) ![](https://img.shields.io/bower/v/CRUD.svg)
 
